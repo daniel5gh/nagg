@@ -1,3 +1,4 @@
+# coding=utf-8
 import datetime
 import logging
 import re
@@ -8,6 +9,7 @@ import requests
 
 __author__ = 'daniel'
 _log = logging.getLogger(__name__)
+
 
 class BaseLeecher:
     # noinspection PyMethodMayBeStatic
@@ -26,6 +28,7 @@ def _get_url_content(url):
         'Proxy-Connection': 'Keep-Alive'
     }
     return requests.get(url, headers=head).content
+
 
 class URLLeecher(BaseLeecher):
     def __init__(self):
@@ -47,8 +50,10 @@ class FeedLeecher(URLLeecher):
 
 # noinspection PyUnresolvedReferences
 class ArticleParserMixin:
-    def _extract_from_node(self, node):
+    @staticmethod
+    def _extract_from_node(node):
         ps = node.find_all('p')
+        # noinspection PyProtectedMember
         a = '\n\n'.join([''.join([s for s in _._all_strings()]) for _ in ps])
         return a
 
@@ -57,6 +62,7 @@ class ArticleParserMixin:
         soup = bs4.BeautifulSoup(data, "html.parser")
         node = soup.find_all(attrs={'class': 'article', 'itemprop': "articleBody"})[0]
         return self._extract_from_node(node)
+
 
 class TweakersLeecher(ArticleParserMixin, FeedLeecher):
     def __init__(self):
