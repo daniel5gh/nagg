@@ -16,5 +16,5 @@ setup(
         ]
     },
     requires=['feedparser', 'requests', 'sqlalchemy',
-              'psycopg2', 'beautifulsoup4']
+              'psycopg2', 'beautifulsoup4', 'django']
 )
