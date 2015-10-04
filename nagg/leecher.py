@@ -121,9 +121,29 @@ class NosJournaalLeecher(GenericRSSLeecher):
 
 
 class TelegraafBinnenlandLeecher(GenericRSSLeecher):
-    article_node_selector = {'id': 'artikelKolom'}
-    plugin_name = 'telegraaf-binnenland-rss'
-    url = 'http://feeds.nos.nl/nosjournaal'
+    article_node_selector = {'id': 'artikel'}
+    plugin_name = 'telegraaf-rss'
+    url = 'http://www.telegraaf.nl/rss/binnenland.xml'
+
+    # this will be passed the node identified by article_node_selector
+    def extract_from_node(self, node):
+        nodes = []
+        nodes.extend(node.find_all('h1'))
+        ak = node.find(attrs={'id': 'artikelKolom'})
+        nodes.extend(ak.find_all('p'))
+        return self._extract_all_strings(nodes)
+
+
+class TelegraafBuitenlandLeecher(TelegraafBinnenlandLeecher):
+    url = 'http://www.telegraaf.nl/rss/buitenland.xml'
+
+
+class TelegraafDigitaalLeecher(TelegraafBinnenlandLeecher):
+    url = 'http://www.telegraaf.nl/rss/digitaal.xml'
+
+
+class TelegraafGamesLeecher(TelegraafBinnenlandLeecher):
+    url = 'http://www.telegraaf.nl/rss/digitaal.games.xml'
 
 
 class LeechRunner:
@@ -136,6 +156,10 @@ class LeechRunner:
     def load_config(self):
         self._leechers.append(TweakersLeecher())
         self._leechers.append(NosJournaalLeecher())
+        self._leechers.append(TelegraafBinnenlandLeecher())
+        self._leechers.append(TelegraafBuitenlandLeecher())
+        self._leechers.append(TelegraafDigitaalLeecher())
+        self._leechers.append(TelegraafGamesLeecher())
 
     def run_one(self, leecher):
         source_id = leecher.get_source_id()
