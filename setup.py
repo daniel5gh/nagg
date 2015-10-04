@@ -15,5 +15,6 @@ setup(
             'nagg_run = nagg.leecher:main',
         ]
     },
-    requires=['feedparser', 'requests', 'sqlalchemy']
+    requires=['feedparser', 'requests', 'sqlalchemy',
+              'psycopg2', 'beautifulsoup4']
 )
