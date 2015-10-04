@@ -25,7 +25,7 @@ class BaseLeecher:
         pass
 
 
-def _get_url_content(url, type_=None):
+def _get_url_content(url, type_=None, cookies=None):
     """Get content on given HTTP(S) url using Wget user agent"""
     head = {
         'User-Agent': 'Wget/1.13.4 (linux-gnu)',
@@ -35,14 +35,12 @@ def _get_url_content(url, type_=None):
     if type_ == 'rss':
         head['Accept'] = 'application/rss+xml,application/rdf+xml,application/atom+xml,text/xml'
 
-    return requests.get(url, headers=head).content
+    return requests.get(url, headers=head, cookies=cookies).content
 
 
 class URLLeecher(BaseLeecher):
     url = None
-
-    def get_url_content(self, type_=None):
-        return _get_url_content(self.url, type_)
+    cookies = None
 
     def get_source_id(self):
         return self.url
@@ -50,7 +48,8 @@ class URLLeecher(BaseLeecher):
 
 class FeedLeecher(URLLeecher):
     def leech_since(self, date):
-        feed = feedparser.parse(self.get_url_content(type_='rss'))
+        data = _get_url_content(self.url, type_='rss', cookies=self.cookies)
+        feed = feedparser.parse(data)
         return feed['items']
 
 
@@ -68,7 +67,7 @@ class ArticleParserMixin:
         return '\n\n'.join([''.join([s for s in _._all_strings()]) for _ in nodes])
 
     def parse_article(self, url):
-        data = _get_url_content(url)
+        data = _get_url_content(url, cookies=self.cookies)
         soup = bs4.BeautifulSoup(data, "html.parser")
         node = soup.find_all(attrs=self.article_node_selector)[0]
         return self.extract_from_node(node)
@@ -149,6 +148,20 @@ class TelegraafGamesLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/digitaal.games.xml'
 
 
+class VolkskrantLeecher(GenericRSSLeecher):
+    article_node_selector = {'class': 'article'}
+    plugin_name = 'volkskrant-rss'
+    url = 'http://www.volkskrant.nl/nieuws/rss.xml'
+    cookies = {'nl_cookiewall_version': '1'}
+
+    # this will be passed the node identified by article_node_selector
+    def extract_from_node(self, node):
+        nodes = []
+        nodes.extend(node.find_all('h1'))
+        nodes.extend(node.find_all('p'))
+        return self._extract_all_strings(nodes)
+
+
 class LeechRunner:
     def __init__(self):
         super().__init__()
@@ -157,6 +170,7 @@ class LeechRunner:
         self.load_config()
 
     def load_config(self):
+        self._leechers.append(VolkskrantLeecher())
         self._leechers.append(TweakersLeecher())
         self._leechers.append(NosJournaalLeecher())
         self._leechers.append(TelegraafBinnenlandLeecher())
@@ -190,6 +204,7 @@ class LeechRunner:
                 )
         except Exception:
             _log.exception('Error doing %s', source_id)
+            raise
 
     def run(self):
         for leecher in self._leechers:
