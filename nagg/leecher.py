@@ -231,7 +231,11 @@ def _dev_debug(url):
     feed = feedparser.parse(_get_url_content(url, 'rss'))
     return feed['items']
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+
+def main():
     runner = LeechRunner()
     runner.run()
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    main()
