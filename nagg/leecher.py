@@ -6,12 +6,16 @@ from time import mktime
 import bs4
 import feedparser
 import requests
+from sqlalchemy import select, func
+from nagg.db import DB
 
 __author__ = 'daniel'
 _log = logging.getLogger(__name__)
 
 
 class BaseLeecher:
+    plugin_name = 'base'
+
     # noinspection PyMethodMayBeStatic
     def leech_since(self, since_date):
         """Get stuff that is new since `date`"""
@@ -65,6 +69,8 @@ class ArticleParserMixin:
 
 
 class TweakersLeecher(ArticleParserMixin, FeedLeecher):
+    plugin_name = 'tweakers-rss'
+
     def __init__(self):
         super().__init__()
         self.configure({
@@ -78,22 +84,35 @@ class TweakersLeecher(ArticleParserMixin, FeedLeecher):
             date = datetime.datetime.fromtimestamp(mktime(date))
             if date > since_date:
                 title = item['title']
-                summary = item['summary']
-                summary = re.sub('<img .*/>', '', summary)
                 link = item['link']
                 article = self.parse_article(link)
-                content = '\n'.join([title, summary, article])
-                yield link, content
+                content = '\n'.join([title, article])
+                yield link, date, content
             else:
                 _log.debug('out of date. ' + item['title'])
 
 
 def _test_run():
+    db = DB()
     l = TweakersLeecher()
-    g = l.leech_since(datetime.datetime(2015, 10, 3, 18))
+
+    # get date of latest entry
+    sel = select([func.max(db.news_items.c.publish_date).label('max_publish_date')])
+    sel = sel.where(db.news_items.c.source_plugin == l.plugin_name)
+    with db.engine.begin() as conn:
+        max_publish_date = conn.execute(sel).scalar()
+    if not max_publish_date:
+        max_publish_date = datetime.datetime(1970, 1, 1)
+    g = l.leech_since(max_publish_date)
 
     for item in g:
         print(item)
+        db.insert_news_item(
+            l.plugin_name,
+            item[0],
+            item[2],
+            item[1]
+        )
 
 
 if __name__ == '__main__':
