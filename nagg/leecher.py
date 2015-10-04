@@ -202,6 +202,30 @@ class VolkskrantWetenschapLeecher(VolkskrantLeecher):
     url = 'http://www.volkskrant.nl/nieuws/gezondheidwetenschap/rss.xml'
 
 
+class ADLeecher(GenericRSSLeecher):
+    article_node_selector = {'class': 'article'}
+    plugin_name = 'ad-rss'
+    cookies = {'nl_cookiewall_version': '1'}
+
+
+class ADDenHaagLeecher(ADLeecher):
+    url = 'http://www.ad.nl/cache/rss_nederland_den_haag.xml'
+
+
+class ADNieuwsLeecher(ADLeecher):
+    url = 'http://www.ad.nl/rss.xml'
+
+
+class TrouwLeecher(GenericRSSLeecher):
+    article_node_selector = {'id': 'art_box2'}
+    plugin_name = 'trouw-rss'
+    cookies = {'nl_cookiewall_version': '1'}
+
+
+class TrouwNieuwsLeecher(TrouwLeecher):
+    url = 'http://www.trouw.nl/nieuws/rss.xml'
+
+
 class LeechRunner:
     def __init__(self):
         super().__init__()
@@ -210,6 +234,9 @@ class LeechRunner:
         self.load_config()
 
     def load_config(self):
+        self._leechers.append(TrouwNieuwsLeecher())
+        self._leechers.append(ADDenHaagLeecher())
+        self._leechers.append(ADNieuwsLeecher())
         self._leechers.append(VolkskrantNieuwsLeecher())
         self._leechers.append(VolkskrantBinnenlandLeecher())
         self._leechers.append(VolkskrantTechLeecher())
