@@ -58,18 +58,20 @@ class FeedLeecher(URLLeecher):
 class ArticleParserMixin:
     article_node_selector = {'class': 'article', 'itemprop': "articleBody"}
 
+    def extract_from_node(self, node):
+        all_nodes = node.find_all()
+        return self._extract_all_strings(all_nodes)
+
     @staticmethod
-    def _extract_from_node(node):
-        ps = node.find_all()
+    def _extract_all_strings(nodes):
         # noinspection PyProtectedMember
-        a = '\n\n'.join([''.join([s for s in _._all_strings()]) for _ in ps])
-        return a
+        return '\n\n'.join([''.join([s for s in _._all_strings()]) for _ in nodes])
 
     def parse_article(self, url):
         data = _get_url_content(url)
         soup = bs4.BeautifulSoup(data, "html.parser")
         node = soup.find_all(attrs=self.article_node_selector)[0]
-        return self._extract_from_node(node)
+        return self.extract_from_node(node)
 
 
 # noinspection PyMethodMayBeStatic
