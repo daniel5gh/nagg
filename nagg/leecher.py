@@ -89,6 +89,9 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
         link = item['link']
         return link
 
+    def extract_content(self, link):
+        return self.parse_article(link)
+
     def leech_since(self, since_date):
         items = super().leech_since(since_date)
         for item in items:
@@ -96,7 +99,7 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
             title = self.extract_title(item)
             if date > since_date:
                 link = self.extract_link(item)
-                article = self.parse_article(link)
+                article = self.extract_content(link)
                 content = '\n\n'.join([title, article])
                 yield link, date, content
             else:
