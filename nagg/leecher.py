@@ -41,8 +41,8 @@ def _get_url_content(url, type_=None):
 class URLLeecher(BaseLeecher):
     url = None
 
-    def get_url_content(self):
-        return _get_url_content(self.url)
+    def get_url_content(self, type_=None):
+        return _get_url_content(self.url, type_)
 
     def get_source_id(self):
         return self.url
@@ -50,7 +50,7 @@ class URLLeecher(BaseLeecher):
 
 class FeedLeecher(URLLeecher):
     def leech_since(self, date):
-        feed = feedparser.parse(self.get_url_content())
+        feed = feedparser.parse(self.get_url_content(type_='rss'))
         return feed['items']
 
 
