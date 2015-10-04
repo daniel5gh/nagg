@@ -174,13 +174,32 @@ class TelegraafGamesLeecher(TelegraafLeecher):
 class VolkskrantLeecher(GenericRSSLeecher):
     article_node_selector = {'class': 'article'}
     plugin_name = 'volkskrant-rss'
-    url = 'http://www.volkskrant.nl/nieuws/rss.xml'
     cookies = {'nl_cookiewall_version': '1'}
 
     def extract_from_node(self, node):
         text = super().extract_from_node(node)
         # text has title twice, remove one
         return '\n'.join(text.split('\n')[1:])
+
+
+class VolkskrantNieuwsLeecher(VolkskrantLeecher):
+    url = 'http://www.volkskrant.nl/nieuws/rss.xml'
+
+
+class VolkskrantBinnenlandLeecher(VolkskrantLeecher):
+    url = 'http://www.volkskrant.nl/nieuws/binnenland/rss.xml'
+
+
+class VolkskrantBuitenlandLeecher(VolkskrantLeecher):
+    url = 'http://www.volkskrant.nl/nieuws/buitenland/rss.xml'
+
+
+class VolkskrantTechLeecher(VolkskrantLeecher):
+    url = 'http://www.volkskrant.nl/tech-media/rss.xml'
+
+
+class VolkskrantWetenschapLeecher(VolkskrantLeecher):
+    url = 'http://www.volkskrant.nl/nieuws/gezondheidwetenschap/rss.xml'
 
 
 class LeechRunner:
@@ -191,7 +210,10 @@ class LeechRunner:
         self.load_config()
 
     def load_config(self):
-        self._leechers.append(VolkskrantLeecher())
+        self._leechers.append(VolkskrantNieuwsLeecher())
+        self._leechers.append(VolkskrantBinnenlandLeecher())
+        self._leechers.append(VolkskrantTechLeecher())
+        self._leechers.append(VolkskrantWetenschapLeecher())
         self._leechers.append(TweakersLeecher())
         self._leechers.append(NosJournaalLeecher())
         self._leechers.append(TelegraafBinnenlandLeecher())
