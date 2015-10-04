@@ -177,6 +177,11 @@ class VolkskrantLeecher(GenericRSSLeecher):
     url = 'http://www.volkskrant.nl/nieuws/rss.xml'
     cookies = {'nl_cookiewall_version': '1'}
 
+    def extract_from_node(self, node):
+        text = super().extract_from_node(node)
+        # text has title twice, remove one
+        return '\n'.join(text.split('\n')[1:])
+
 
 class LeechRunner:
     def __init__(self):
