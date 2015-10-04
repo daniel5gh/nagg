@@ -120,10 +120,9 @@ class NosJournaalLeecher(GenericRSSLeecher):
     url = 'http://feeds.nos.nl/nosjournaal'
 
 
-class TelegraafBinnenlandLeecher(GenericRSSLeecher):
+class TelegraafLeecher(GenericRSSLeecher):
     article_node_selector = {'id': 'artikel'}
     plugin_name = 'telegraaf-rss'
-    url = 'http://www.telegraaf.nl/rss/binnenland.xml'
 
     # this will be passed the node identified by article_node_selector
     def extract_from_node(self, node):
@@ -134,15 +133,19 @@ class TelegraafBinnenlandLeecher(GenericRSSLeecher):
         return self._extract_all_strings(nodes)
 
 
-class TelegraafBuitenlandLeecher(TelegraafBinnenlandLeecher):
+class TelegraafBinnenlandLeecher(TelegraafLeecher):
+    url = 'http://www.telegraaf.nl/rss/binnenland.xml'
+
+
+class TelegraafBuitenlandLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/buitenland.xml'
 
 
-class TelegraafDigitaalLeecher(TelegraafBinnenlandLeecher):
+class TelegraafDigitaalLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/digitaal.xml'
 
 
-class TelegraafGamesLeecher(TelegraafBinnenlandLeecher):
+class TelegraafGamesLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/digitaal.games.xml'
 
 
