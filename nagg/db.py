@@ -1,7 +1,7 @@
 # coding=utf-8
 import datetime
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, DateTime
+from sqlalchemy import Table, Column, Integer, String, MetaData, DateTime
 
 __author__ = 'daniel'
 
@@ -12,7 +12,7 @@ class DB:
         self._db_host = '[2001:888:10e2:3:216:3eff:fe5a:52f6]'
         self.engine = create_engine(
             'postgresql+psycopg2://nagg:nagg@{host}:5432/naggdb'.format(host=self._db_host),
-            echo=True)
+            echo=False)
         self.metadata = MetaData()
 
         self.news_items = Table(

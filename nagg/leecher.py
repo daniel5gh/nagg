@@ -210,6 +210,7 @@ class LeechRunner:
         # noinspection PyBroadException
         try:
             g = leecher.leech_since(max_publish_date)
+            i = 0
             for item in g:
                 _log.debug(item)
                 self._db.insert_news_item(
@@ -218,6 +219,8 @@ class LeechRunner:
                     text=item[2],
                     publish_date=item[1],
                 )
+                i += 1
+            _log.info('Added %d', i)
         except Exception:
             _log.exception('Error doing %s', source_id)
             raise
@@ -233,6 +236,7 @@ def _dev_debug(url):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     runner = LeechRunner()
     runner.run()
 
