@@ -13,6 +13,7 @@ setup(
     entry_points={
         'console_scripts': [
             'nagg_run = nagg.leecher:main',
+            'nagg_manage = django_nagg:manage',
         ]
     },
     requires=['feedparser', 'requests', 'sqlalchemy',
