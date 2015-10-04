@@ -26,7 +26,7 @@ class BaseLeecher:
         return None, None, None
 
 
-def _get_url_content(url, type_=None, cookies=None):
+def _get_url(url, type_=None, cookies=None):
     """Get content on given HTTP(S) url using Wget user agent"""
     head = {
         'User-Agent': 'Wget/1.13.4 (linux-gnu)',
@@ -36,22 +36,49 @@ def _get_url_content(url, type_=None, cookies=None):
     if type_ == 'rss':
         head['Accept'] = 'application/rss+xml,application/rdf+xml,application/atom+xml,text/xml'
 
-    return requests.get(url, headers=head, cookies=cookies).content
+    return requests.get(url, headers=head, cookies=cookies)
+
+
+def _get_url_content(url, type_=None, cookies=None):
+    return _get_url(url, type_, cookies).content
 
 
 class URLLeecher(BaseLeecher):
     url = None
+    url_accept_type = None
     cookies = None
+
+    def leech_since(self, since_date):
+        r = _get_url(self.url, self.url_accept_type, self.cookies)
+        date = r.headers.get('last-modified', None)
+        if date:
+            # noinspection PyProtectedMember
+            date = feedparser._parse_date(date)
+            date = datetime.datetime.fromtimestamp(mktime(date))
+            _log.debug('http modified date: %s', date)
+        else:
+            date = since_date
+        if date >= since_date:
+            return self.url, date, r.content
+        else:
+            _log.debug('No new content: %s', self.url)
+            return None, None, None
 
     def get_source_id(self):
         return self.url
 
 
 class FeedLeecher(URLLeecher):
-    def leech_since(self, date):
-        data = _get_url_content(self.url, type_='rss', cookies=self.cookies)
-        feed = feedparser.parse(data)
-        return self.url, date, feed['items']
+    url_accept_type = 'rss'
+
+    def leech_since(self, since_date):
+        _, _, data = super().leech_since(since_date)
+        if data:
+            feed = feedparser.parse(data)
+            return self.url, since_date, feed['items']
+        else:
+            _log.debug('No new feed content: %s', self.url)
+            return None, None, None
 
 
 # noinspection PyUnresolvedReferences
