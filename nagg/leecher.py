@@ -22,7 +22,8 @@ class BaseLeecher:
     # noinspection PyMethodMayBeStatic
     def leech_since(self, since_date):
         """Get stuff that is new since `date`"""
-        pass
+        # link, date, content
+        return None, None, None
 
 
 def _get_url_content(url, type_=None, cookies=None):
@@ -50,16 +51,19 @@ class FeedLeecher(URLLeecher):
     def leech_since(self, date):
         data = _get_url_content(self.url, type_='rss', cookies=self.cookies)
         feed = feedparser.parse(data)
-        return feed['items']
+        return self.url, date, feed['items']
 
 
 # noinspection PyUnresolvedReferences
 class ArticleParserMixin:
     article_node_selector = {'class': 'article', 'itemprop': "articleBody"}
 
+    # this will be passed the node identified by article_node_selector
     def extract_from_node(self, node):
-        all_nodes = node.find_all()
-        return self._extract_all_strings(all_nodes)
+        nodes = []
+        nodes.extend(node.find_all('h1'))
+        nodes.extend(node.find_all('p'))
+        return self._extract_all_strings(nodes)
 
     @staticmethod
     def _extract_all_strings(nodes):
@@ -94,7 +98,7 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
         return self.parse_article(link)
 
     def leech_since(self, since_date):
-        items = super().leech_since(since_date)
+        _, _, items = super().leech_since(since_date)
         for item in items:
             date = self.extract_date(item)
             title = self.extract_title(item)
@@ -123,14 +127,6 @@ class TelegraafLeecher(GenericRSSLeecher):
     article_node_selector = {'id': 'artikel'}
     plugin_name = 'telegraaf-rss'
 
-    # this will be passed the node identified by article_node_selector
-    def extract_from_node(self, node):
-        nodes = []
-        nodes.extend(node.find_all('h1'))
-        ak = node.find(attrs={'id': 'artikelKolom'})
-        nodes.extend(ak.find_all('p'))
-        return self._extract_all_strings(nodes)
-
 
 class TelegraafBinnenlandLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/binnenland.xml'
@@ -153,13 +149,6 @@ class VolkskrantLeecher(GenericRSSLeecher):
     plugin_name = 'volkskrant-rss'
     url = 'http://www.volkskrant.nl/nieuws/rss.xml'
     cookies = {'nl_cookiewall_version': '1'}
-
-    # this will be passed the node identified by article_node_selector
-    def extract_from_node(self, node):
-        nodes = []
-        nodes.extend(node.find_all('h1'))
-        nodes.extend(node.find_all('p'))
-        return self._extract_all_strings(nodes)
 
 
 class LeechRunner:
