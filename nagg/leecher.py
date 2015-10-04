@@ -177,16 +177,19 @@ class LeechRunner:
 
         _log.info("Since %s doing %s", max_publish_date, source_id)
 
-        g = leecher.leech_since(max_publish_date)
-
-        for item in g:
-            _log.debug(item)
-            self._db.insert_news_item(
-                source_plugin=source_id,
-                url=item[0],
-                text=item[2],
-                publish_date=item[1],
-            )
+        # noinspection PyBroadException
+        try:
+            g = leecher.leech_since(max_publish_date)
+            for item in g:
+                _log.debug(item)
+                self._db.insert_news_item(
+                    source_plugin=source_id,
+                    url=item[0],
+                    text=item[2],
+                    publish_date=item[1],
+                )
+        except Exception:
+            _log.exception('Error doing %s', source_id)
 
     def run(self):
         for leecher in self._leechers:
