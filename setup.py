@@ -12,10 +12,9 @@ setup(
     description='News Agg',
     entry_points={
         'console_scripts': [
-            'nagg_run = nagg.leecher:main',
             'nagg_manage = django_nagg:manage',
         ]
     },
-    requires=['feedparser', 'requests', 'sqlalchemy',
+    requires=['feedparser', 'requests',
               'psycopg2', 'beautifulsoup4', 'django']
 )

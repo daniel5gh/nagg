@@ -12,7 +12,6 @@ from sqlalchemy import select, func
 from django.db.models import Max
 from django.utils import timezone
 
-from nagg.db import DB
 from nagg.models import NewsItem
 
 __author__ = 'daniel'
@@ -236,64 +235,6 @@ class TrouwNieuwsLeecher(TrouwLeecher):
     url = 'http://www.trouw.nl/nieuws/rss.xml'
 
 
-class LeechRunnerSQLAlchemy:
-    def __init__(self):
-        super().__init__()
-        self._db = DB()
-        self._leechers = []
-        self.load_config()
-
-    def load_config(self):
-        self._leechers.append(TrouwNieuwsLeecher())
-        self._leechers.append(ADDenHaagLeecher())
-        self._leechers.append(ADNieuwsLeecher())
-        self._leechers.append(VolkskrantNieuwsLeecher())
-        self._leechers.append(VolkskrantBinnenlandLeecher())
-        self._leechers.append(VolkskrantTechLeecher())
-        self._leechers.append(VolkskrantWetenschapLeecher())
-        self._leechers.append(TweakersLeecher())
-        self._leechers.append(NosJournaalLeecher())
-        self._leechers.append(TelegraafBinnenlandLeecher())
-        self._leechers.append(TelegraafBuitenlandLeecher())
-        self._leechers.append(TelegraafDigitaalLeecher())
-        self._leechers.append(TelegraafGamesLeecher())
-
-    def run_one(self, leecher):
-        source_id = leecher.get_source_id()
-        # determine since date
-        table = self._db.news_items
-        sel = select([func.max(table.c.publish_date).label('max_publish_date')])
-        sel = sel.where(table.c.source_plugin == source_id)
-        with self._db.engine.begin() as conn:
-            max_publish_date = conn.execute(sel).scalar()
-        if not max_publish_date:
-            max_publish_date = datetime.datetime(1970, 1, 1)
-
-        _log.info("Since %s doing %s", max_publish_date, source_id)
-
-        # noinspection PyBroadException
-        try:
-            g = leecher.leech_since(max_publish_date)
-            i = 0
-            for item in g:
-                _log.debug(item)
-                self._db.insert_news_item(
-                    source_plugin=source_id,
-                    url=item[0],
-                    text=item[2],
-                    publish_date=item[1],
-                )
-                i += 1
-            _log.info('Added %d', i)
-        except Exception:
-            _log.exception('Error doing %s', source_id)
-            raise
-
-    def run(self):
-        for leecher in self._leechers:
-            self.run_one(leecher)
-
-
 class LeechRunner:
     def __init__(self):
         super().__init__()
@@ -357,11 +298,3 @@ def _dev_debug(url):
     return feed['items']
 
 
-def main():
-    # logging.basicConfig(level=logging.INFO)
-    runner = LeechRunnerSQLAlchemy()
-    runner.run()
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-    main()
