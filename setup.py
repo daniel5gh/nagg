@@ -15,6 +15,6 @@ setup(
             'nagg_manage = django_nagg:manage',
         ]
     },
-    requires=['feedparser', 'requests',
+    requires=['feedparser', 'requests', 'django-grappelli',
               'psycopg2', 'beautifulsoup4', 'django']
 )
