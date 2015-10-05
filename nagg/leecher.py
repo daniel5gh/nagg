@@ -1,13 +1,19 @@
 # coding=utf-8
 import datetime
+from datetime import tzinfo
 import logging
 # import re
 from time import mktime
 import bs4
 import feedparser
 import requests
+
 from sqlalchemy import select, func
+from django.db.models import Max
+from django.utils import timezone
+
 from nagg.db import DB
+from nagg.models import NewsItem
 
 __author__ = 'daniel'
 _log = logging.getLogger(__name__)
@@ -54,7 +60,8 @@ class URLLeecher(BaseLeecher):
         if date:
             # noinspection PyProtectedMember
             date = feedparser._parse_date(date)
-            date = datetime.datetime.fromtimestamp(mktime(date))
+            date = datetime.datetime.fromtimestamp(mktime(date),
+                                                   tz=datetime.timezone.utc)
             _log.debug('http modified date: %s', date)
         else:
             date = since_date
@@ -78,7 +85,7 @@ class FeedLeecher(URLLeecher):
             return self.url, since_date, feed['items']
         else:
             _log.debug('No new feed content: %s', self.url)
-            return None, None, None
+            return None, None, []
 
 
 # noinspection PyUnresolvedReferences
@@ -114,7 +121,8 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
 
     def extract_date(self, item):
         date = item['published_parsed']
-        date = datetime.datetime.fromtimestamp(mktime(date))
+        date = datetime.datetime.fromtimestamp(mktime(date),
+                                               tz=datetime.timezone.utc)
         return date
 
     def extract_link(self, item):
@@ -126,6 +134,8 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
 
     def leech_since(self, since_date):
         _, _, items = super().leech_since(since_date)
+        if items is None:
+            items = []
         for item in items:
             date = self.extract_date(item)
             title = self.extract_title(item)
@@ -226,7 +236,7 @@ class TrouwNieuwsLeecher(TrouwLeecher):
     url = 'http://www.trouw.nl/nieuws/rss.xml'
 
 
-class LeechRunner:
+class LeechRunnerSQLAlchemy:
     def __init__(self):
         super().__init__()
         self._db = DB()
@@ -284,6 +294,64 @@ class LeechRunner:
             self.run_one(leecher)
 
 
+class LeechRunner:
+    def __init__(self):
+        super().__init__()
+        self._leechers = []
+        self.load_config()
+
+    def load_config(self):
+        self._leechers.append(TrouwNieuwsLeecher())
+        self._leechers.append(ADDenHaagLeecher())
+        self._leechers.append(ADNieuwsLeecher())
+        self._leechers.append(VolkskrantNieuwsLeecher())
+        self._leechers.append(VolkskrantBinnenlandLeecher())
+        self._leechers.append(VolkskrantTechLeecher())
+        self._leechers.append(VolkskrantWetenschapLeecher())
+        self._leechers.append(TweakersLeecher())
+        self._leechers.append(NosJournaalLeecher())
+        self._leechers.append(TelegraafBinnenlandLeecher())
+        self._leechers.append(TelegraafBuitenlandLeecher())
+        self._leechers.append(TelegraafDigitaalLeecher())
+        self._leechers.append(TelegraafGamesLeecher())
+
+    @staticmethod
+    def run_one(leecher):
+        source_id = leecher.get_source_id()
+        # determine since date
+        max_publish_date = NewsItem.objects.filter(
+            source=source_id).aggregate(Max('publish_date'))['publish_date__max']
+
+        if not max_publish_date:
+            max_publish_date = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+
+        _log.info("Since %s doing %s", max_publish_date, source_id)
+
+        # noinspection PyBroadException
+        try:
+            g = leecher.leech_since(max_publish_date)
+            i = 0
+            for item in g:
+                _log.debug(item)
+                ni = NewsItem(
+                    source=source_id,
+                    url=item[0],
+                    text=item[2],
+                    publish_date=item[1],
+                    retrieval_date=timezone.now()
+                )
+                ni.save()
+                i += 1
+            _log.info('Adding %d', i)
+        except Exception:
+            _log.exception('Error doing %s', source_id)
+            raise
+
+    def run(self):
+        for leecher in self._leechers:
+            self.run_one(leecher)
+
+
 def _dev_debug(url):
     feed = feedparser.parse(_get_url_content(url, 'rss'))
     return feed['items']
@@ -291,7 +359,7 @@ def _dev_debug(url):
 
 def main():
     # logging.basicConfig(level=logging.INFO)
-    runner = LeechRunner()
+    runner = LeechRunnerSQLAlchemy()
     runner.run()
 
 if __name__ == '__main__':

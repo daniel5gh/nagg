@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'viewer',
+    'nagg',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -83,7 +84,7 @@ DATABASES = {
         'NAME': 'naggdb',
         'USER': 'nagg',
         'PASSWORD': 'nagg',
-        'HOST': '[2001:888:10e2:3:216:3eff:fe5a:52f6]',
+        'HOST': '2001:888:10e2:3:216:3eff:fe5a:52f6',
         'PORT': '5432',
     }
 }
