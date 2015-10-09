@@ -10,7 +10,11 @@ class NewsItem(models.Model):
     retrieval_date = models.DateTimeField()
 
     def get_title(self):
-        return self.text.split('\n')[0]
+        parts = self.text.split('\n')
+        if parts:
+            return parts[0]
+        else:
+            ''
 
     def __str__(self):
         return self.get_title()
