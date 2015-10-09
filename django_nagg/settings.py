@@ -42,6 +42,7 @@ INSTALLED_APPS = (
 
     'viewer',
     'nagg',
+    'django_shell_ipynb',
 )
 
 MIDDLEWARE_CLASSES = (
