@@ -63,3 +63,10 @@ target/
 
 nagg.iml
 .idea
+#sphinx
+doc/_templates
+doc/_build
+doc/_static
+
+# vim
+*.swp
