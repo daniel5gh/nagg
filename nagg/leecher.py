@@ -1,14 +1,17 @@
 # coding=utf-8
+"""
+A module that can leech internet resources. It is able to get new resources
+since a specified :class:`datetime.datetime`.
+
+:author: Daniël <daniel5git@spiet.nl>
+"""
 import datetime
-from datetime import tzinfo
 import logging
-# import re
 from time import mktime
 import bs4
 import feedparser
 import requests
 
-from sqlalchemy import select, func
 from django.db.models import Max
 from django.utils import timezone
 
@@ -19,20 +22,49 @@ _log = logging.getLogger(__name__)
 
 
 class BaseLeecher:
+    """This class is the base for all leechers
+
+    """
     plugin_name = 'base'
 
-    def get_source_id(self):
+    def get_source_id(self) -> str:
+        """Get an unique identifier for this leecher.  This will
+        usually describe the source.
+
+        :return: Leecher identifier
+        :rtype: str
+        """
         return self.plugin_name
 
     # noinspection PyMethodMayBeStatic
-    def leech_since(self, since_date):
-        """Get stuff that is new since `date`"""
-        # link, date, content
+    def leech_since(self, since_date) -> tuple:
+        """Get stuff that is new since `since_date`
+
+        :type since_date: datetime.datetime
+        :param since_date: new since :class:`datetime.datetime`
+        :returns: A 3-tuple `(url_to_content, publish_date, content)`
+        :rtype: tuple
+        """
         return None, None, None
 
 
 def _get_url(url, type_=None, cookies=None):
-    """Get content on given HTTP(S) url using Wget user agent"""
+    """Get content on given HTTP(S) url using Wget user agent.
+
+    This method uses :mod:`requests` to make the request. The
+    `type_` that is passed determines some behavior. Passing
+    `rss` will set the `Accept` header to request
+    `'application/rss+xml,application/rdf+xml,application/atom+xml,text/xml'`.
+
+    :type url: str
+    :param url: URL to fetch from
+    :type type_: str
+    :param type_: A string indicating the type of resource.
+    :type cookies: dict
+    :param cookies: Cookies to send with the request
+    :returns: Response object
+    :rtype: requests.Response
+    """
     head = {
         'User-Agent': 'Wget/1.13.4 (linux-gnu)',
         'Connection': 'Close',
@@ -45,15 +77,39 @@ def _get_url(url, type_=None, cookies=None):
 
 
 def _get_url_content(url, type_=None, cookies=None):
+    """Like :func:`_get_url` but returns the resource content.
+
+    :type url: str
+    :param url: URL to fetch from
+    :type type_: str
+    :param type_: A string indicating the type of resource.
+    :type cookies: dict
+    :param cookies: Cookies to send with the request
+    :rtype: bytes
+    """
     return _get_url(url, type_, cookies).content
 
 
 class URLLeecher(BaseLeecher):
+    """This leecher is specialized to handle HTTP(S) URLs.
+
+    The work horse behind this class is :mod:`requests`.
+    """
+    #: A :class:`str` containing URL we are leeching from
     url = None
+    #: Affects the used `Accept` header. See :func:`_get_url` `type_` argument.
     url_accept_type = None
+    #: A :class:`dict` with cookies to send with the HTTP request
     cookies = None
 
     def leech_since(self, since_date):
+        """Get content from the :any:`URLLeecher.url`.
+
+        :param since_date: See :any:`BaseLeecher.leech_since`.
+        :return: See :any:`BaseLeecher.leech_since`.
+        :rtype: tuple
+        """
+        # noinspection PyTypeChecker
         r = _get_url(self.url, self.url_accept_type, self.cookies)
         date = r.headers.get('last-modified', None)
         if date:
@@ -71,13 +127,27 @@ class URLLeecher(BaseLeecher):
             return None, None, None
 
     def get_source_id(self):
+        """Returns the url of the resource.
+
+        :rtype: str
+        """
+
         return self.url
 
 
 class FeedLeecher(URLLeecher):
+    """Leech a RSS feed.
+
+    This uses the base :class:`URLLeecher` to fetch the URL content and
+    then uses :mod:`feedparser` its :class:`feed` class to interpret
+    and parse the data.
+
+    The third item in the tuple, the content, is from `feedparser`.
+    """
     url_accept_type = 'rss'
 
     def leech_since(self, since_date):
+        """See base class"""
         _, _, data = super().leech_since(since_date)
         if data:
             feed = feedparser.parse(data)
@@ -89,6 +159,8 @@ class FeedLeecher(URLLeecher):
 
 # noinspection PyUnresolvedReferences
 class ArticleParserMixin:
+    """Mixin that can parse text from a HTML article"""
+
     article_node_selector = {'class': 'article', 'itemprop': "articleBody"}
 
     # this will be passed the node identified by article_node_selector
@@ -296,5 +368,3 @@ class LeechRunner:
 def _dev_debug(url):
     feed = feedparser.parse(_get_url_content(url, 'rss'))
     return feed['items']
-
-

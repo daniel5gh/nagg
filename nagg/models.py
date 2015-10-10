@@ -3,6 +3,9 @@ from django.db import models
 
 
 class NewsItem(models.Model):
+    """A NewsItem represents an article fetched from the internets."""
+
+    #: From where the article has been fetched.
     source = models.TextField()
     url = models.URLField()
     text = models.TextField()
