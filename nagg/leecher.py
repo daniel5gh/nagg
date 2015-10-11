@@ -42,10 +42,10 @@ class BaseLeecher:
 
         :type since_date: datetime.datetime
         :param since_date: new since :class:`datetime.datetime`
-        :returns: A 3-tuple `(url_to_content, publish_date, content)`
+        :returns: :class:`generator` of dicts`
         :rtype: tuple
         """
-        return None, None, None
+        pass
 
 
 def _get_url(url, type_=None, cookies=None):
@@ -102,7 +102,7 @@ class URLLeecher(BaseLeecher):
     #: A :class:`dict` with cookies to send with the HTTP request
     cookies = None
 
-    def leech_since(self, since_date, url=None):
+    def leech_since(self, since_date):
         """Get content from the :any:`URLLeecher.url` or passed url
         is it is given.
 
@@ -111,8 +111,7 @@ class URLLeecher(BaseLeecher):
         :rtype: tuple
         """
 
-        if url is None:
-            url = self.url
+        url = self.url
 
         # noinspection PyTypeChecker
         r = _get_url(url, self.url_accept_type, self.cookies)
@@ -126,10 +125,13 @@ class URLLeecher(BaseLeecher):
         else:
             date = since_date
         if date >= since_date:
-            return url, date, r.content
+            yield {
+                'url': url,
+                'date': date,
+                'content': r.content,
+            }
         else:
             _log.debug('No new content: %s', url)
-            return None, None, None
 
     def get_source_id(self):
         """Returns the url of the resource.
@@ -151,15 +153,20 @@ class FeedLeecher(URLLeecher):
     """
     url_accept_type = 'rss'
 
-    def leech_since(self, since_date, url=None):
+    def leech_since(self, since_date):
         """See base class"""
-        _, _, data = super().leech_since(since_date, url)
-        if data:
-            feed = feedparser.parse(data)
-            return self.url, since_date, feed['items']
-        else:
-            _log.debug('No new feed content: %s', self.url)
-            return None, None, []
+        for obj in super().leech_since(since_date):
+            data = obj['content']
+            if data:
+                feed = feedparser.parse(data)
+                for item in feed['items']:
+                    yield {
+                        'url': self.url,
+                        'date': since_date,
+                        'content': item,
+                    }
+            else:
+                _log.debug('No new feed content: %s', self.url)
 
 
 # noinspection PyUnresolvedReferences
@@ -209,18 +216,20 @@ class GenericRSSLeecher(FeedLeecher):
         summary = item.get('summary', None)
         return summary
 
-    def leech_since(self, since_date, url=None):
-        _, _, items = super().leech_since(since_date, url)
-        if items is None:
-            items = []
-        for item in items:
+    def leech_since(self, since_date):
+        for obj in super().leech_since(since_date):
+            item = obj['content']
             date = self.extract_date(item)
             title = self.extract_title(item)
             if date > since_date:
                 link = self.extract_link(item)
                 article = self.extract_content(item)
                 content = '\n\n'.join([title, article])
-                yield link, date, content
+                yield {
+                    'url': link,
+                    'date': date,
+                    'content': content,
+                }
             else:
                 _log.debug('out of date. ' + title)
 
@@ -322,6 +331,16 @@ class TrouwNieuwsLeecher(TrouwLeecher):
     url = 'http://www.trouw.nl/nieuws/rss.xml'
 
 
+class YoutubeRSSLeecher(GenericRSSLeecher):
+    plugin_name = 'youtube-rss'
+
+    def __init__(self, *, url, source):
+        self.url = url
+        self.source = source
+
+    def get_source_id(self):
+        return 'YouTube - {}'.format(self.source)
+
 class LeechRunner:
     def __init__(self):
         super().__init__()
@@ -342,6 +361,10 @@ class LeechRunner:
         self._leechers.append(TelegraafBuitenlandLeecher())
         self._leechers.append(TelegraafDigitaalLeecher())
         self._leechers.append(TelegraafGamesLeecher())
+        self._leechers.append(YoutubeRSSLeecher(
+            url='https://www.youtube.com/feeds/videos.xml?channel_id=UCvBqzzvUBLCs8Y7Axb-jZew',
+            source='Sixty Symbols'
+        ))
 
     @staticmethod
     def run_one(leecher):
@@ -363,9 +386,9 @@ class LeechRunner:
                 _log.debug(item)
                 ni = NewsItem(
                     source=source_id,
-                    url=item[0],
-                    text=item[2],
-                    publish_date=item[1],
+                    url=item['url'],
+                    text=item['content'],
+                    publish_date=item['date'],
                     retrieval_date=timezone.now()
                 )
                 ni.save()
