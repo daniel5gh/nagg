@@ -284,7 +284,11 @@ class VolkskrantLeecher(GenericArticleLeecher):
     def extract_from_node(self, node):
         text = super().extract_from_node(node)
         # text has title twice, remove one
-        return '\n'.join(text.split('\n')[1:])
+        parts = '\n'.join(text.split('\n'))
+        if parts:
+            return '\n'.join(text.split('\n')[1:])
+        else:
+            return text
 
 
 class VolkskrantNieuwsLeecher(VolkskrantLeecher):
@@ -331,6 +335,20 @@ class TrouwNieuwsLeecher(TrouwLeecher):
     url = 'http://www.trouw.nl/nieuws/rss.xml'
 
 
+class OverheidDataLeecher(GenericArticleLeecher):
+    article_node_selector = {'class': 'module'}
+    plugin_name = 'overhheid-data-rss'
+    url = 'https://data.overheid.nl/data/feeds/dataset.atom'
+
+    def extract_from_node(self, node):
+        text = super().extract_from_node(node)
+        # text has title twice, remove one
+        parts = '\n'.join(text.split('\n'))
+        if parts:
+            return '\n'.join(text.split('\n')[1:])
+        else:
+            return text
+
 class YoutubeRSSLeecher(GenericRSSLeecher):
     plugin_name = 'youtube-rss'
 
@@ -348,6 +366,7 @@ class LeechRunner:
         self.load_config()
 
     def load_config(self):
+        self._leechers.append(OverheidDataLeecher())
         self._leechers.append(TrouwNieuwsLeecher())
         self._leechers.append(ADDenHaagLeecher())
         self._leechers.append(ADNieuwsLeecher())
