@@ -102,15 +102,20 @@ class URLLeecher(BaseLeecher):
     #: A :class:`dict` with cookies to send with the HTTP request
     cookies = None
 
-    def leech_since(self, since_date):
-        """Get content from the :any:`URLLeecher.url`.
+    def leech_since(self, since_date, url=None):
+        """Get content from the :any:`URLLeecher.url` or passed url
+        is it is given.
 
         :param since_date: See :any:`BaseLeecher.leech_since`.
         :return: See :any:`BaseLeecher.leech_since`.
         :rtype: tuple
         """
+
+        if url is None:
+            url = self.url
+
         # noinspection PyTypeChecker
-        r = _get_url(self.url, self.url_accept_type, self.cookies)
+        r = _get_url(url, self.url_accept_type, self.cookies)
         date = r.headers.get('last-modified', None)
         if date:
             # noinspection PyProtectedMember
@@ -121,9 +126,9 @@ class URLLeecher(BaseLeecher):
         else:
             date = since_date
         if date >= since_date:
-            return self.url, date, r.content
+            return url, date, r.content
         else:
-            _log.debug('No new content: %s', self.url)
+            _log.debug('No new content: %s', url)
             return None, None, None
 
     def get_source_id(self):
@@ -146,9 +151,9 @@ class FeedLeecher(URLLeecher):
     """
     url_accept_type = 'rss'
 
-    def leech_since(self, since_date):
+    def leech_since(self, since_date, url=None):
         """See base class"""
-        _, _, data = super().leech_since(since_date)
+        _, _, data = super().leech_since(since_date, url)
         if data:
             feed = feedparser.parse(data)
             return self.url, since_date, feed['items']
@@ -183,7 +188,7 @@ class ArticleParserMixin:
 
 
 # noinspection PyMethodMayBeStatic
-class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
+class GenericRSSLeecher(FeedLeecher):
     plugin_name = 'generic-rss'
 
     def extract_title(self, item):
@@ -200,11 +205,12 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
         link = item['link']
         return link
 
-    def extract_content(self, link):
-        return self.parse_article(link)
+    def extract_content(self, item):
+        summary = item.get('summary', None)
+        return summary
 
-    def leech_since(self, since_date):
-        _, _, items = super().leech_since(since_date)
+    def leech_since(self, since_date, url=None):
+        _, _, items = super().leech_since(since_date, url)
         if items is None:
             items = []
         for item in items:
@@ -212,26 +218,35 @@ class GenericRSSLeecher(ArticleParserMixin, FeedLeecher):
             title = self.extract_title(item)
             if date > since_date:
                 link = self.extract_link(item)
-                article = self.extract_content(link)
+                article = self.extract_content(item)
                 content = '\n\n'.join([title, article])
                 yield link, date, content
             else:
                 _log.debug('out of date. ' + title)
 
 
-class TweakersLeecher(GenericRSSLeecher):
+# noinspection PyMethodMayBeStatic
+class GenericArticleLeecher(ArticleParserMixin, GenericRSSLeecher):
+    plugin_name = 'generic-article-rss'
+
+    def extract_content(self, item):
+        link = self.extract_link(item)
+        return self.parse_article(link)
+
+
+class TweakersLeecher(GenericArticleLeecher):
     article_node_selector = {'class': 'article', 'itemprop': "articleBody"}
     plugin_name = 'tweakers-rss'
     url = 'http://feeds.feedburner.com/tweakers/mixed'
 
 
-class NosJournaalLeecher(GenericRSSLeecher):
+class NosJournaalLeecher(GenericArticleLeecher):
     article_node_selector = {'class': 'article_textwrap'}
     plugin_name = 'nos-journaal-rss'
     url = 'http://feeds.nos.nl/nosjournaal'
 
 
-class TelegraafLeecher(GenericRSSLeecher):
+class TelegraafLeecher(GenericArticleLeecher):
     article_node_selector = {'id': 'artikel'}
     plugin_name = 'telegraaf-rss'
 
@@ -252,7 +267,7 @@ class TelegraafGamesLeecher(TelegraafLeecher):
     url = 'http://www.telegraaf.nl/rss/digitaal.games.xml'
 
 
-class VolkskrantLeecher(GenericRSSLeecher):
+class VolkskrantLeecher(GenericArticleLeecher):
     article_node_selector = {'class': 'article'}
     plugin_name = 'volkskrant-rss'
     cookies = {'nl_cookiewall_version': '1'}
@@ -283,7 +298,7 @@ class VolkskrantWetenschapLeecher(VolkskrantLeecher):
     url = 'http://www.volkskrant.nl/nieuws/gezondheidwetenschap/rss.xml'
 
 
-class ADLeecher(GenericRSSLeecher):
+class ADLeecher(GenericArticleLeecher):
     article_node_selector = {'class': 'article'}
     plugin_name = 'ad-rss'
     cookies = {'nl_cookiewall_version': '1'}
@@ -297,7 +312,7 @@ class ADNieuwsLeecher(ADLeecher):
     url = 'http://www.ad.nl/rss.xml'
 
 
-class TrouwLeecher(GenericRSSLeecher):
+class TrouwLeecher(GenericArticleLeecher):
     article_node_selector = {'id': 'art_box2'}
     plugin_name = 'trouw-rss'
     cookies = {'nl_cookiewall_version': '1'}
