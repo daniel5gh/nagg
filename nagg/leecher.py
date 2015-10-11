@@ -361,10 +361,24 @@ class LeechRunner:
         self._leechers.append(TelegraafBuitenlandLeecher())
         self._leechers.append(TelegraafDigitaalLeecher())
         self._leechers.append(TelegraafGamesLeecher())
-        self._leechers.append(YoutubeRSSLeecher(
-            url='https://www.youtube.com/feeds/videos.xml?channel_id=UCvBqzzvUBLCs8Y7Axb-jZew',
-            source='Sixty Symbols'
-        ))
+        for url, source in (
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC7DdEm33SyaTDtWYGO2CwdA', 'Physics Girl'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCvBqzzvUBLCs8Y7Axb-jZew', 'Sixty Symbols'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCUHW94eEFW7hkUMVaZz4eDg', 'MinutePhysics'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCUK0HBIBWgM2c4vsPhkYY4w', 'The Slow Mo Guys'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC6nSFpj9HTCZ5t-N3Rm3-HA', 'Vsauce'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCHnyfMqiRRG1u-2MsSQLbXA', 'Veritasium'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCCAgrIbwcJ67zIow1pNF30A', 'nottinghamscience'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCo-3ThNQmPmQSQL_L6Lx1_w', 'DeepSkyVideos'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC2DjFE7Xf11URZqWBigcVOQ', 'EEVblog'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCtESv1e7ntJaLJYKIO1FoYw', 'Periodic Videos'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCivA7_KLKWo43tFcCkFvydw', 'Applied Science'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A', 'Numberphile'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC6107grRI4m0o2-emgoDnAA', 'SmarterEveryDay'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCrMePiHCWG4Vwqv3t7W9EFg', 'SciShow Space'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UCM-p4l2OPH_oX6tFrjKT-9A', 'Year In Space'),
+        ):
+            self._leechers.append(YoutubeRSSLeecher(url=url, source=source))
 
     @staticmethod
     def run_one(leecher):
