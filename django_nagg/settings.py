@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'viewer',
     'nagg',
     'django_shell_ipynb',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -114,3 +115,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 GRAPPELLI_ADMIN_TITLE = 'NAGG'
+
+# Celery settings
+
+BROKER_URL = 'redis://localhost:6379/10'
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
