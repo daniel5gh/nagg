@@ -16,6 +16,7 @@ from django.db.models import Max
 from django.utils import timezone
 
 from nagg.models import NewsItem
+from nagg.tasks import download_youtube
 
 __author__ = 'daniel'
 _log = logging.getLogger(__name__)
@@ -349,6 +350,7 @@ class OverheidDataLeecher(GenericArticleLeecher):
         else:
             return text
 
+
 class YoutubeRSSLeecher(GenericRSSLeecher):
     plugin_name = 'youtube-rss'
 
@@ -358,6 +360,12 @@ class YoutubeRSSLeecher(GenericRSSLeecher):
 
     def get_source_id(self):
         return 'YouTube - {}'.format(self.source)
+
+    def leech_since(self, since_date):
+        for obj in super().leech_since(since_date):
+            yield obj
+            download_youtube.delay(obj['url'])
+
 
 class LeechRunner:
     def __init__(self):
