@@ -401,6 +401,7 @@ class LeechRunner:
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UC6107grRI4m0o2-emgoDnAA', 'SmarterEveryDay'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCrMePiHCWG4Vwqv3t7W9EFg', 'SciShow Space'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCM-p4l2OPH_oX6tFrjKT-9A', 'Year In Space'),
+            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC9-y-6csu5WGm29I7JiwpnA', 'Computerphile'),
         ):
             self._leechers.append(YoutubeRSSLeecher(url=url, source=source))
 
