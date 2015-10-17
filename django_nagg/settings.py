@@ -88,7 +88,7 @@ DATABASES = {
         'NAME': 'naggdb',
         'USER': 'nagg',
         'PASSWORD': 'nagg',
-        'HOST': '2001:888:10e2:3:216:3eff:fe5a:52f6',
+        'HOST': 'db1.lxc',
         'PORT': '5432',
     }
 }
