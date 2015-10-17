@@ -12,11 +12,8 @@ import bs4
 import feedparser
 import requests
 
-from django.db.models import Max
-from django.utils import timezone
 
-from nagg.models import NewsItem
-from nagg.tasks import download_youtube
+from nagg.tasks import download_youtube, do_one_leecher
 
 __author__ = 'daniel'
 _log = logging.getLogger(__name__)
@@ -407,41 +404,9 @@ class LeechRunner:
         ):
             self._leechers.append(YoutubeRSSLeecher(url=url, source=source))
 
-    @staticmethod
-    def run_one(leecher):
-        source_id = leecher.get_source_id()
-        # determine since date
-        max_publish_date = NewsItem.objects.filter(
-            source=source_id).aggregate(Max('publish_date'))['publish_date__max']
-
-        if not max_publish_date:
-            max_publish_date = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
-
-        _log.info("Since %s doing %s", max_publish_date, source_id)
-
-        # noinspection PyBroadException
-        try:
-            g = leecher.leech_since(max_publish_date)
-            i = 0
-            for item in g:
-                _log.debug(item)
-                ni = NewsItem(
-                    source=source_id,
-                    url=item['url'],
-                    text=item['content'],
-                    publish_date=item['date'],
-                    retrieval_date=timezone.now()
-                )
-                ni.save()
-                i += 1
-            _log.info('Adding %d', i)
-        except Exception:
-            _log.exception('Error doing %s', source_id)
-            raise
-
     def run(self):
         for leecher in self._leechers:
-            self.run_one(leecher)
+            do_one_leecher.delay(leecher)
 
 
 def _dev_debug(url):
