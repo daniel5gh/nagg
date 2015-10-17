@@ -128,14 +128,17 @@ CELERY_RESULT_SERIALIZER = 'pickle'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s/%(threadName)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '%(levelname)s/%(processName)s %(name)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
         },
+        'alt': {
+            'format': '%(asctime)s - %(processName)s/%(name)s - %(levelname)s - %(message)s'
+        }
     },
     'handlers': {
         'console': {
@@ -147,7 +150,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'debug.log'),
-            'formatter': 'verbose',
+            'formatter': 'alt',
         },
     },
     'loggers': {
@@ -161,14 +164,18 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        # does not work :(
-        'root': {
+        'celery': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
-            'formatter': 'verbose'
-            # 'propagate': True,
-            # 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': True,
         },
+    },
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'DEBUG',
+        'formatter': 'verbose'
+        # 'propagate': True,
+        # 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
     },
 }
 
