@@ -397,7 +397,7 @@ class LeechRunner:
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCHnyfMqiRRG1u-2MsSQLbXA', 'Veritasium'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCCAgrIbwcJ67zIow1pNF30A', 'nottinghamscience'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCo-3ThNQmPmQSQL_L6Lx1_w', 'DeepSkyVideos'),
-            ('https://www.youtube.com/feeds/videos.xml?channel_id=UC2DjFE7Xf11URZqWBigcVOQ', 'EEVblog'),
+            # ('https://www.youtube.com/feeds/videos.xml?channel_id=UC2DjFE7Xf11URZqWBigcVOQ', 'EEVblog'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCtESv1e7ntJaLJYKIO1FoYw', 'Periodic Videos'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCivA7_KLKWo43tFcCkFvydw', 'Applied Science'),
             ('https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A', 'Numberphile'),
