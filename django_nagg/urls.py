@@ -16,8 +16,31 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from rest_framework import routers, serializers, viewsets
+
+from nagg.models import NewsItem
+
+
+# Serializers define the API representation.
+class NewsItemSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = NewsItem
+        fields = ('id', 'url', 'source', 'text', 'publish_date', 'retrieval_date')
+
+
+# ViewSets define the view behavior.
+class NewsItemViewSet(viewsets.ModelViewSet):
+    queryset = NewsItem.objects.all()
+    serializer_class = NewsItemSerializer
+
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'newsitems', NewsItemViewSet)
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

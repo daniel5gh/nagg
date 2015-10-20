@@ -7,6 +7,7 @@ import sys
 # Django starts so that shared_task will use this app.
 from .celery import app as celery_app
 
+
 # copy from manage.py
 # we use this as entry point in setup
 def manage():
