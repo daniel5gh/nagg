@@ -17,6 +17,6 @@ setup(
     },
     requires=['feedparser', 'requests', 'django-grappelli',
               'psycopg2', 'beautifulsoup4', 'django',
-              'django-celery', 'celery[redis]', 'youtube_dl'
+              'django-celery', 'celery[redis]', 'youtube_dl', 'numpy'
               ]
 )
