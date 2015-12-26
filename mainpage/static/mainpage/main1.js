@@ -1,7 +1,10 @@
 define([
     'jquery',
-    'd3'
-], function ($, d3) {
+    'd3',
+    'backbone',
+    'mainpage/views/testview',
+    'mainpage/models/newsitem'
+], function ($, d3, bb, TestView, NewsItem) {
     var w = 500;
     var h = 100;
     var barPadding = 1;
@@ -9,27 +12,6 @@ define([
         .append("svg")
         .attr("width", w)
         .attr("height", h);
-
-    var dataset = [ 5, 10, 15, 20, 25 ];
-
-    var circles = svg.append('g').selectAll("circle")
-        .data(dataset)
-        .enter()
-        .append("circle");
-
-    circles
-        .attr("cx", function(d, i) {
-            return (i * 50) + 25;
-        })
-        .attr("cy", h/2)
-        .attr("r", function(d) {
-            return d;
-        })
-        .attr("fill", "yellow")
-        .attr("stroke", "orange")
-        .attr("stroke-width", function(d) {
-            return d/2;
-        });
 
     var dataset2 = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
         11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
@@ -54,4 +36,6 @@ define([
         .attr("y", function(d) {
             return h - d;  //Height minus data value
         });
+
+    var tv = new TestView()
 });
