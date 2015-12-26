@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'mainpage',
     'viewer',
     'nagg',
     'django_shell_ipynb',
@@ -113,7 +114,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_root"),
+]
 
 GRAPPELLI_ADMIN_TITLE = 'NAGG'
 
