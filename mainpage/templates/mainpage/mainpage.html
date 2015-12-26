@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title></title>
+    <title>NAGG</title>
     <link rel="stylesheet" href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
     <script async data-main="{% static 'mainpage/mainpage.js' %}"
             src="{% static 'node_modules/requirejs/require.js' %}"></script>
@@ -22,7 +22,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Project name</a>
+            <a class="navbar-brand" href="#">.N.A.G.G.</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -39,31 +39,30 @@
         <div id="main-table" class="panel panel-default">
             <div class="panel-heading">
                 <strong>News Items</strong>
+
                 <div class="btn-group btn-group-xs pull-right" role="group">
-                    <a class="link-prev btn btn-default" role="button">Prev</a>
-                    <a class="link-next btn btn-default" role="button">Next</a>
+                    <a class="link-prev btn btn-default" role="button"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                    <a class="link-next btn btn-default" role="button"><span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Source</th>
-                    <th>Text</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="list-group">
+            </div>
         </div>
     </div>
 </div>
 <script id="newsitem-row-template" type="text/html">
-    <td><%- publish_date %></td>
-    <td><%- source %></td>
+    <% var lines = obj.text.split('\n'); %>
+    <h4 class="list-group-item-heading"><%- lines[0] %></h4>
+    <div class="list-group-item-text">
+        <ul>
+            <li style="display: inline"><%- source %></li>
+            <li style="display: inline"><%- publish_date %></li>
+        </ul>
+    </div>
     <% if (obj._expanded) { %>
-        <td><%- obj.text %></td>
-    <% } else { %>
-    <td><%- obj.text.split('\n')[0] %></td>
+    <% for (i in lines) { %>
+    <p class="list-group-item-text"><%- lines[i] %></p>
+    <% }%>
     <% } %>
 </script>
 </body>
