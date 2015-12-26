@@ -41,8 +41,10 @@
                 <strong>News Items</strong>
 
                 <div class="btn-group btn-group-xs pull-right" role="group">
-                    <a class="link-prev btn btn-default" role="button"><span class="glyphicon glyphicon-chevron-left"></span></a>
-                    <a class="link-next btn btn-default" role="button"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="link-prev btn btn-default" role="button"><span
+                            class="glyphicon glyphicon-chevron-left"></span></a>
+                    <a class="link-next btn btn-default" role="button"><span
+                            class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
             <div class="list-group">
@@ -52,11 +54,17 @@
 </div>
 <script id="newsitem-row-template" type="text/html">
     <% var lines = obj.text.split('\n'); %>
-    <h4 class="list-group-item-heading"><%- lines[0] %></h4>
-    <div class="list-group-item-text">
+    <h4 class="list-group-item-heading">
+        <%- lines[0] %>
+        <span class="pull-right small ">
+            <a class="link-button glyphicon glyphicon-link" href="<%- obj.url %>"></a>
+            <i class="expand-button glyphicon glyphicon-chevron-down"></i>
+        </span>
+    </h4>
+    <div class="list-group-item-text small">
         <ul>
-            <li style="display: inline"><%- source %></li>
             <li style="display: inline"><%- publish_date %></li>
+            <li style="display: inline"><%- source %></li>
         </ul>
     </div>
     <% if (obj._expanded) { %>

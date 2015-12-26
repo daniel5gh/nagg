@@ -8,7 +8,7 @@ define([
         className: 'list-group-item',
         events: {
             'click': function () {
-                this.model.set('_expanded', !this.model.get('_expanded'))
+                this.toggleExpand();
             }
         },
         initialize: function () {
@@ -17,11 +17,26 @@ define([
             this.model.on('remove', function () {
                 self.$el.remove();
             });
+            // not rendered yet
+            //this.$expand_button = this.$('.expand-button');
         },
         template: _.template($('#newsitem-row-template').html()),
         render: function () {
             this.$el.html(this.template(this.model.toJSON()));
+            // now it is rendered
+            this.$expand_button = this.$('.expand-button');
             return this;
+        },
+        toggleExpand: function () {
+            var newMode = !this.model.get('_expanded');
+            this.model.set('_expanded', newMode);
+            if (newMode) {
+                this.$expand_button.removeClass('glyphicon-chevron-down');
+                this.$expand_button.addClass('glyphicon-chevron-up');
+            } else {
+                this.$expand_button.removeClass('glyphicon-chevron-up');
+                this.$expand_button.addClass('glyphicon-chevron-down');
+            }
         }
     });
     var NewsItemsTable = Backbone.View.extend({
