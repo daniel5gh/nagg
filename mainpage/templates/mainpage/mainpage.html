@@ -8,11 +8,17 @@
             src="{% static 'node_modules/requirejs/require.js' %}"></script>
 </head>
 <body>
-<!--<button id="add-friend">Add Friend</button>-->
-<table id="main-table">
-    <thead></thead>
-    <tbody></tbody>
-</table>
+<div id="main-table">
+    <ul>
+        <li><a class="link-prev">Prev</a></li>
+        <li><a class="link-next">Next</a></li>
+    </ul>
+    <table>
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <script id="newsitem-row-template" type="text/html">
     <td><%= source %></td>
     <td><%= text %></td>

@@ -1,10 +1,10 @@
 define([
     'jquery',
     'd3',
+    'backbone',
     'mainpage/views/newsitemviews',
     'mainpage/collections/newsitems',
-    'mainpage/models/newsitem'
-], function ($, d3, NewsItemViews, NewsItems, NewsItem) {
+], function ($, d3, BackBone, NewsItemViews, NewsItems) {
     var d3Bar = function () {
         var w = 500;
         var h = 100;
@@ -39,13 +39,35 @@ define([
             });
     };
 
+    var MainPageRouter = Backbone.Router.extend({
+        routes: {
+            "page/:page": "page",  // #page/12
+            "*actions": "defaultRoute",  // matches http://example.com/#anything-here
+        },
+    });
+
     var newsItemCollection = new NewsItems();
     var tv = new NewsItemViews.NewsItemsTable({
-        el: '#main-table>tbody',
+        el: '#main-table',
         collection: newsItemCollection,
     });
-    newsItemCollection.fetch();
 
+    var mpr = new MainPageRouter();
+
+    mpr.on('route:defaultRoute', function (actions) {
+        console.log('default route actions: ' + actions);
+        newsItemCollection.fetch();
+    });
+
+    mpr.on('route:page', function (pageNr) {
+        newsItemCollection.fetch({
+            data: {page: pageNr}
+        });
+    });
+
+    BackBone.history.start();
+
+    //handy access during development
     window.nic = newsItemCollection;
     window.tv = tv;
 });
