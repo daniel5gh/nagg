@@ -196,4 +196,3 @@ REST_FRAMEWORK = {
 
 PGJSON_ENCODER_CLASS = 'nagg.NumpyEncoder'
 PGJSON_LOADS_FUNC = 'nagg.json_numpy_loads'
-PGJSONB_LOADS_FUNC = 'nagg.json_numpy_loads'
