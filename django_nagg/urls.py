@@ -30,7 +30,7 @@ class NewsItemSerializer(serializers.HyperlinkedModelSerializer):
 
 # ViewSets define the view behavior.
 class NewsItemViewSet(viewsets.ModelViewSet):
-    queryset = NewsItem.objects.all()
+    queryset = NewsItem.objects.all().order_by('-publish_date')
     serializer_class = NewsItemSerializer
 
 
