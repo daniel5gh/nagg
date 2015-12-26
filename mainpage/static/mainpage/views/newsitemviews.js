@@ -5,9 +5,14 @@ define([
 ], function ($, _, Backbone) {
     var NewsItemRow = Backbone.View.extend({
         tagName: 'tr',
-        //events: {
-        //    "click #add-friend": "showPrompt",
-        //},
+        events: {},
+        initialize: function () {
+            var self = this;
+            this.model.on('change', this.render, this);
+            this.model.on('remove', function () {
+                self.$el.remove();
+            });
+        },
         template: _.template($('#newsitem-row-template').html()),
         render: function () {
             this.$el.html(this.template(this.model.toJSON()));
@@ -16,30 +21,18 @@ define([
     });
     var NewsItemsTable = Backbone.View.extend({
         initialize: function () {
-            var self = this;
             this.$tbody = this.$('tbody');
             this.$aPrev = this.$('.link-prev');
             this.$aNext = this.$('.link-next');
 
-            // reset the whole view on any sync
-            this.collection.on('sync', function () {
-                self.renderPrevNext();
-                self.$tbody.empty();
-                self.render(self);
-            });
+            // when sync is done, we know we have new values for next/prev
+            this.collection.on('sync', this.updatePrevNext, this);
+            this.collection.on('add', this.addRowView, this);
 
-            // issue with these events is that we need to keep track of views
-            //this.collection.on('change add remove', function (model) {
-            //    var a = arguments;
-            //    console.log('rest', a);
-            //    //self.$tbody.empty();
-            //    self.renderOne(model);
-            //});
+            return this;
         },
-        //events: {
-        //    "click #add-friend": "showPrompt",
-        //},
-        renderOne: function(model) {
+        events: {},
+        addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});
             this.$tbody.append(newsItemView.render().$el);
 
@@ -47,13 +40,14 @@ define([
         },
         render: function () {
             var self = this;
+            this.$tbody.empty();
             this.collection.each(function (newsItem) {
-                self.renderOne(newsItem);
+                self.addRowView(newsItem);
             });
 
             return this;
         },
-        renderPrevNext: function () {
+        updatePrevNext: function () {
             // string.split('=')[1] is undefined when no = in string (this happens when it points to
             // first page) we can || 1. When we have no url at all (on first and last page), make it false
             // and remove the href.
@@ -64,6 +58,8 @@ define([
             this.collection.urlNext ?
                 this.$aNext.attr('href', '#page/' + (this.collection.urlNext.split('=')[1] || 1)) :
                 this.$aNext.removeAttr('href');
+
+            return this;
         }
     });
 
