@@ -8,11 +8,9 @@ define([
         //events: {
         //    "click #add-friend": "showPrompt",
         //},
+        template: _.template($('#newsitem-row-template').html()),
         render: function () {
-            var template = _.template($('#newsitem-row-template').html());
-            var html = template(this.model.toJSON());
-            this.$el.html(html);
-
+            this.$el.html(this.template(this.model.toJSON()));
             return this;
         }
     });
