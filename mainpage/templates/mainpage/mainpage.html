@@ -4,11 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <script async data-main="{% static 'mainpage/mainpage.js' %}" src="{% static 'node_modules/requirejs/require.js' %}"></script>
+    <script async data-main="{% static 'mainpage/mainpage.js' %}"
+            src="{% static 'node_modules/requirejs/require.js' %}"></script>
 </head>
 <body>
-<button id="add-friend">Add Friend</button>
-<ul id="friends-list">
-</ul>
+<!--<button id="add-friend">Add Friend</button>-->
+<table id="main-table">
+    <thead></thead>
+    <tbody></tbody>
+</table>
+<script id="newsitem-row-template" type="text/html">
+    <td><%= source %></td>
+    <td><%= text %></td>
+</script>
 </body>
 </html>
