@@ -36,16 +36,18 @@
 </nav>
 <div class="container">
     <div class="starter-template">
-        <h1>News Items</h1>
-
-        <div id="main-table">
-            <ul>
-                <li><a class="link-prev">Prev</a></li>
-                <li><a class="link-next">Next</a></li>
-            </ul>
+        <div id="main-table" class="panel panel-default">
+            <div class="panel-heading">
+                <strong>News Items</strong>
+                <div class="btn-group btn-group-xs pull-right" role="group">
+                    <a class="link-prev btn btn-default" role="button">Prev</a>
+                    <a class="link-next btn btn-default" role="button">Next</a>
+                </div>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    <th>Date</th>
                     <th>Source</th>
                     <th>Text</th>
                 </tr>
@@ -56,8 +58,13 @@
     </div>
 </div>
 <script id="newsitem-row-template" type="text/html">
+    <td><%- publish_date %></td>
     <td><%- source %></td>
-    <td><%- text %></td>
+    <% if (obj._expanded) { %>
+        <td><%- obj.text %></td>
+    <% } else { %>
+    <td><%- obj.text.split('\n')[0] %></td>
+    <% } %>
 </script>
 </body>
 </html>

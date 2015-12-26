@@ -5,7 +5,11 @@ define([
 ], function ($, _, Backbone) {
     var NewsItemRow = Backbone.View.extend({
         tagName: 'tr',
-        events: {},
+        events: {
+            'click': function () {
+                this.model.set('_expanded', !this.model.get('_expanded'))
+            }
+        },
         initialize: function () {
             var self = this;
             this.model.on('change', this.render, this);

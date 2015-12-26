@@ -10,7 +10,8 @@ define([
             url: '',
             text: '',
             publish_date: '',
-            retrieval_date: ''
+            retrieval_date: '',
+            _expanded: false,
         }
     });
 });
