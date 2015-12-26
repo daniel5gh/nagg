@@ -19,6 +19,7 @@
     "requirejs": "~2.1.22",
     "jquery": "~2.1.4",
     "d3": "~3.5.12",
-    "backbone": "~1.2.3"
+    "backbone": "~1.2.3",
+    "bootstrap": "~3.3.6"
   }
 }
