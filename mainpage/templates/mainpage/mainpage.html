@@ -54,11 +54,12 @@
 </div>
 <script id="newsitem-row-template" type="text/html">
     <% var lines = obj.text.split('\n'); %>
+    <% var arrowClass = obj._expanded ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'; %>
     <h4 class="list-group-item-heading">
         <%- lines[0] %>
         <span class="pull-right small ">
             <a class="link-button glyphicon glyphicon-link" href="<%- obj.url %>"></a>
-            <i class="expand-button glyphicon glyphicon-chevron-down"></i>
+            <span class="expand-button glyphicon <%- arrowClass %>" role="button"></span>
         </span>
     </h4>
     <div class="list-group-item-text small">
@@ -67,11 +68,11 @@
             <li style="display: inline"><%- source %></li>
         </ul>
     </div>
-    <% if (obj._expanded) { %>
-    <% for (i in lines) { %>
-    <p class="list-group-item-text"><%- lines[i] %></p>
-    <% }%>
-    <% } %>
+    <div class="collapse list-group-item-text">
+        <% for (i in lines) { %>
+        <p><%- lines[i] %></p>
+        <% }%>
+    </div>
 </script>
 </body>
 </html>

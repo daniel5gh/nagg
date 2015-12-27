@@ -25,17 +25,20 @@ define([
             this.$el.html(this.template(this.model.toJSON()));
             // now it is rendered
             this.$expand_button = this.$('.expand-button');
+            this.$collapsible = this.$('.collapse');
+            // initialize
+            //this.$collapsible.collapse({
+            //    toggle: false
+            //});
             return this;
         },
         toggleExpand: function () {
             var newMode = !this.model.get('_expanded');
             this.model.set('_expanded', newMode);
             if (newMode) {
-                this.$expand_button.removeClass('glyphicon-chevron-down');
-                this.$expand_button.addClass('glyphicon-chevron-up');
+                this.$collapsible.collapse('show');
             } else {
-                this.$expand_button.removeClass('glyphicon-chevron-up');
-                this.$expand_button.addClass('glyphicon-chevron-down');
+                this.$collapsible.collapse('hide');
             }
         }
     });
