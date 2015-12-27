@@ -15,14 +15,15 @@ define([
             var self = this;
             this.model.on('change', this.render, this);
             this.model.on('remove', function () {
-                self.$el.remove();
+                self.$el.fadeOut(160, function() { $(this).remove(); });;
             });
             // not rendered yet
             //this.$expand_button = this.$('.expand-button');
         },
         template: _.template($('#newsitem-row-template').html()),
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
+            this.$el
+                .html(this.template(this.model.toJSON()));
             // now it is rendered
             this.$expand_button = this.$('.expand-button');
             this.$collapsible = this.$('.collapse');
@@ -57,13 +58,16 @@ define([
         events: {},
         addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});
-            this.$list.append(newsItemView.render().$el);
+            newsItemView.render().$el
+                .hide()
+                .appendTo(this.$list)
+                .fadeIn(160);
 
             return newsItemView;
         },
         render: function () {
             var self = this;
-            this.$list.empty();
+            this.$list.fadeOut(300, function() { $(this).remove(); });
             this.collection.each(function (newsItem) {
                 self.addRowView(newsItem);
             });
