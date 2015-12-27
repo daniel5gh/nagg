@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.db.models import Count
 from rest_framework import routers, serializers, viewsets
 
 from nagg.models import NewsItem
@@ -34,9 +35,31 @@ class NewsItemViewSet(viewsets.ModelViewSet):
     serializer_class = NewsItemSerializer
 
 
+# noinspection PyAbstractClass
+class NewsItemSourceFacetSerializer(serializers.Serializer):
+    source = serializers.CharField(read_only=True)
+    source__count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        fields = ('source', 'source__count')
+
+
+class NewsItemSourceFacet(viewsets.ModelViewSet):
+    queryset = NewsItem.objects.values('source').annotate(Count('source')).order_by('-source__count')
+    serializer_class = NewsItemSourceFacetSerializer
+    pagination_class = None
+
+# date facets
+# select date(publish_date), count(publish_date)
+# from nagg_newsitem
+# GROUP BY date(publish_date)
+# ORDER BY count(publish_date) DESC
+# ;
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'newsitems', NewsItemViewSet)
+router.register(r'facet/newsitems/source', NewsItemSourceFacet)
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
