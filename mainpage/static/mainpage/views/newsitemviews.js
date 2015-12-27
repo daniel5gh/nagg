@@ -44,7 +44,7 @@ define([
     });
     var NewsItemsTable = Backbone.View.extend({
         initialize: function () {
-            this.list = this.$('.list-group');
+            this.$list = this.$('.list-group');
             this.$aPrev = this.$('.link-prev');
             this.$aNext = this.$('.link-next');
 
@@ -57,13 +57,13 @@ define([
         events: {},
         addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});
-            this.list.append(newsItemView.render().$el);
+            this.$list.append(newsItemView.render().$el);
 
             return newsItemView;
         },
         render: function () {
             var self = this;
-            this.list.empty();
+            this.$list.empty();
             this.collection.each(function (newsItem) {
                 self.addRowView(newsItem);
             });
