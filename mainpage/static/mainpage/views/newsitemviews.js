@@ -92,7 +92,7 @@ define([
             clearTimeout(self.searchTimer);
             this.searchTimer = setTimeout(function () {
                 self.collection.queryParamsModel.set('q', self.$searchBox.val());
-            }, 100);
+            }, 250);
         },
         addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});

@@ -15,7 +15,6 @@ define([
             if (key === '_total') {
                 var max = Math.ceil(value / this.get('page_size'));
                 this.set('_max_page', max);
-                this.set('page', Math.min(this.get('page'), max));
             }
             if (key === 'page') {
                 value = Math.max(1, value);
@@ -31,6 +30,8 @@ define([
             var params = this.toJSON();
             return $.each(params, function (key) {
                 if (key[0] === '_') {
+                    delete params[key];
+                } else if (key === 'q' && params[key] === '') {
                     delete params[key];
                 }
             });
@@ -79,8 +80,12 @@ define([
             var self = this;
             options || (options = {});
             options.data || (options.data = {});
-            options.error = function () {
-                self.reset();
+            options.error = function (c, response) {
+                if (/Invalid page/.test(response['responseText'])) {
+                    self.queryParamsModel.set('page', 1);
+                } else {
+                    this.reset();
+                }
             };
             $.extend(options.data, this.queryParamsModel.getQueryParams());
             console.log('fetch', options.data);
