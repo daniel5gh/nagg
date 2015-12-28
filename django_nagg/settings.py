@@ -206,4 +206,4 @@ PGJSON_ENCODER_CLASS = 'nagg.NumpyEncoder'
 PGJSON_LOADS_FUNC = 'nagg.json_numpy_loads'
 
 # SHOW_TOOLBAR_CALLBACK = lambda x: True
-INTERNAL_IPS = '192.168.2.3'
+# INTERNAL_IPS = '192.168.2.3'
