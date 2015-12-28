@@ -11,14 +11,16 @@ define([
             _total: 0,
             _max_page: 1,
         },
-        set: function (key, value) {
+        set: function (key, value, options) {
             if (key === '_total') {
-                this.set('_max_page', Math.ceil(value / this.get('page_size')));
+                var max = Math.ceil(value / this.get('page_size'));
+                this.set('_max_page', max);
+                this.set('page', Math.min(this.get('page'), max));
             }
             if (key === 'page') {
                 value = Math.max(1, value);
             }
-            Backbone.Model.prototype.set.apply(this, [key, value]);
+            Backbone.Model.prototype.set.apply(this, [key, value, options]);
             return this;
         },
         /**
@@ -81,6 +83,7 @@ define([
                 self.reset();
             };
             $.extend(options.data, this.queryParamsModel.getQueryParams());
+            console.log('fetch', options.data);
             return this.constructor.__super__.fetch.apply(this, [options]);
         },
     });
