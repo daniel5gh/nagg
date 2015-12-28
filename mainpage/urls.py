@@ -7,4 +7,5 @@ __author__ = 'Daniël'
 
 urlpatterns = [
     url(r'^$', views.MainPageView.as_view(), name='mainpage'),
+    url(r'^collections$', views.CollectionsView.as_view(), name='collections'),
 ]
