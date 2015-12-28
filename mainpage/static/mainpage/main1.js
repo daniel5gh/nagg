@@ -31,16 +31,6 @@ define([
 
     mpr.on('route:defaultRoute', function (actions) {
         console.log('default route actions: ' + actions);
-        newsItemCollection.queryParams.page = 1;
-        newsItemCollection.fetch();
-    });
-
-    mpr.on('route:page', function (pageNr, pageSize) {
-        if (pageSize) {
-            newsItemCollection.queryParams.page_size = +pageSize;
-        }
-        newsItemCollection.queryParams.page = +pageNr;
-        newsItemCollection.fetch();
     });
 
     sourceFacetCollection.fetch();

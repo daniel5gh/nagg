@@ -44,19 +44,28 @@ define([
             }
         }
     });
+
+
     var NewsItemsTable = Backbone.View.extend({
         initialize: function () {
+            var self = this;
             this.$list = this.$('.list-group');
             this.$aPrev = this.$('.link-prev');
             this.$aNext = this.$('.link-next');
             this.$searchBox = this.$('.search-box');
             this.$nrHits = this.$('.nr-hits');
+            this.$pageNumber = this.$('.page-number');
 
             // when sync is done, we know we have new values for next/prev
-            this.collection.on('sync', this.updatePrevNext, this);
             this.collection.on('reset', this.render, this);
             this.collection.on('add', this.addRowView, this);
 
+            this.collection.queryParamsModel.on('change:_total', function (model, value) {
+                self.$nrHits.text(value);
+            });
+            this.collection.queryParamsModel.on('change:page', function (model, value) {
+                self.$pageNumber.text(value);
+            });
             return this;
         },
         events: {
@@ -67,13 +76,20 @@ define([
                 this.$searchBox.val('');
                 this.handleSearchInputChange();
             },
+            'click .link-prev': function () {
+                var qpm = this.collection.queryParamsModel;
+                qpm.set('page', qpm.get('page') - 1);
+            },
+            'click .link-next': function () {
+                var qpm = this.collection.queryParamsModel;
+                qpm.set('page', qpm.get('page') + 1);
+            },
         },
         handleSearchInputChange: function () {
             var self = this;
             clearTimeout(self.searchTimer);
             this.searchTimer = setTimeout(function () {
-                self.collection.queryParams.q = self.$searchBox.val();
-                self.collection.fetch();
+                self.collection.queryParamsModel.set('q', self.$searchBox.val());
             }, 100);
         },
         addRowView: function (model) {
@@ -94,30 +110,9 @@ define([
             this.collection.each(function (newsItem) {
                 self.addRowView(newsItem);
             });
-            this.updatePrevNext();
 
             return this;
         },
-        updatePrevNext: function () {
-            // string.split('=')[1] is undefined when no = in string (this happens when it points to
-            // first page) we can || 1. When we have no url at all (on first and last page), make it false
-            // and remove the href.
-            this.collection.urlPrevious ?
-                this.$aPrev.attr('href',
-                    '#page/' + (this.collection.queryParams.page - 1) +
-                    '/' + this.collection.queryParams.page_size) :
-                this.$aPrev.removeAttr('href');
-
-            this.collection.urlNext ?
-                // + to coerce to int
-                this.$aNext.attr('href', '#page/' + (+this.collection.queryParams.page + 1) +
-                    '/' + this.collection.queryParams.page_size) :
-                this.$aNext.removeAttr('href');
-
-            this.$nrHits.text(this.collection.totalRecords);
-
-            return this;
-        }
     });
 
     return {
