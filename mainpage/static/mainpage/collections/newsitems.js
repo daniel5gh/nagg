@@ -15,8 +15,23 @@ define([
             if (key === '_total') {
                 this.set('_max_page', Math.ceil(value / this.get('page_size')));
             }
+            if (key === 'page') {
+                value = Math.max(1, value);
+            }
             Backbone.Model.prototype.set.apply(this, [key, value]);
             return this;
+        },
+        /**
+         * All attr not starting with _ are query params
+         * @returns {*}
+         */
+        getQueryParams: function () {
+            var params = this.toJSON();
+            return $.each(params, function (key) {
+                if (key[0] === '_') {
+                    delete params[key];
+                }
+            });
         },
         getNextPageNr: function () {
             return Math.min(this.get('page') + 1, this.get('_max_page'));
@@ -33,6 +48,7 @@ define([
             return this;
         },
     });
+
     return Backbone.Collection.extend({
         model: NewsItem,
         url: 'api/v1/newsitems/',
@@ -41,10 +57,14 @@ define([
             this.queryParamsModel = new QueryParamModel();
             this.queryParamsModel.on('change:page', function() {
                 self.fetch();
-            }, this);
+            });
             this.queryParamsModel.on('change:q', function() {
                 self.fetch();
-            }, this);
+            });
+            this.on('reset', function () {
+                self.queryParamsModel.set('_total', 0);
+            });
+
             this.fetch();
             return this;
         },
@@ -53,23 +73,14 @@ define([
             this.queryParamsModel.set('_total', +response.count);
             return response.results;
         },
-        updatePagingState: function (response) {
-        },
         fetch: function(options) {
             var self = this;
             options || (options = {});
             options.data || (options.data = {});
             options.error = function () {
-                self.queryParamsModel.set('_total', 0);
                 self.reset();
             };
-            var params = this.queryParamsModel.toJSON();
-            $.each(params, function (key) {
-                if (key[0] === '_') {
-                    delete params[key];
-                }
-            });
-            $.extend(options.data, params);
+            $.extend(options.data, this.queryParamsModel.getQueryParams());
             return this.constructor.__super__.fetch.apply(this, [options]);
         },
     });
