@@ -30,13 +30,13 @@ define([
 
     mpr.on('route:defaultRoute', function (actions) {
         console.log('default route actions: ' + actions);
+        newsItemCollection.queryParams.page = 1;
         newsItemCollection.fetch();
     });
 
     mpr.on('route:page', function (pageNr) {
-        newsItemCollection.fetch({
-            data: {page: pageNr}
-        });
+        newsItemCollection.queryParams.page = pageNr;
+        newsItemCollection.fetch();
     });
 
     sourceFacetCollection.fetch();

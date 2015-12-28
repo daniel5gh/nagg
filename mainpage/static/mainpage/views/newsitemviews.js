@@ -15,7 +15,7 @@ define([
             var self = this;
             this.model.on('change', this.render, this);
             this.model.on('remove', function () {
-                self.$el.fadeOut(160, function() { $(this).remove(); });;
+                self.$el.fadeOut(160, function() { $(this).remove(); });
             });
             // not rendered yet
             //this.$expand_button = this.$('.expand-button');
@@ -48,6 +48,8 @@ define([
             this.$list = this.$('.list-group');
             this.$aPrev = this.$('.link-prev');
             this.$aNext = this.$('.link-next');
+            this.$searchBox = this.$('.search-box');
+            this.$nrHits = this.$('.nr-hits');
 
             // when sync is done, we know we have new values for next/prev
             this.collection.on('sync', this.updatePrevNext, this);
@@ -55,7 +57,18 @@ define([
 
             return this;
         },
-        events: {},
+        events: {
+            'keyup .search-box': function() {
+                console.log('key');
+                var self = this;
+                clearTimeout(self.searchTimer);
+                this.searchTimer = setTimeout(function () {
+                    console.log('search');
+                    self.collection.queryParams.q = self.$searchBox.val();
+                    self.collection.fetch();
+                }, 100);
+            }
+        },
         addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});
             newsItemView.render().$el
@@ -79,12 +92,15 @@ define([
             // first page) we can || 1. When we have no url at all (on first and last page), make it false
             // and remove the href.
             this.collection.urlPrevious ?
-                this.$aPrev.attr('href', '#page/' + (this.collection.urlPrevious.split('=')[1] || 1)) :
+                this.$aPrev.attr('href', '#page/' + (this.collection.queryParams.page - 1)) :
                 this.$aPrev.removeAttr('href');
 
             this.collection.urlNext ?
-                this.$aNext.attr('href', '#page/' + (this.collection.urlNext.split('=')[1] || 1)) :
+                // + to coerce to int
+                this.$aNext.attr('href', '#page/' + (+this.collection.queryParams.page + 1)) :
                 this.$aNext.removeAttr('href');
+
+            this.$nrHits.text(this.collection.totalRecords);
 
             return this;
         }
