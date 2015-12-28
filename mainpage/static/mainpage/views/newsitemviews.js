@@ -55,6 +55,7 @@ define([
             this.$searchBox = this.$('.search-box');
             this.$nrHits = this.$('.nr-hits');
             this.$pageNumber = this.$('.page-number');
+            this.$pageMax = this.$('.page-max');
 
             // when sync is done, we know we have new values for next/prev
             this.collection.on('reset', this.render, this);
@@ -62,6 +63,9 @@ define([
 
             this.collection.queryParamsModel.on('change:_total', function (model, value) {
                 self.$nrHits.text(value);
+            });
+            this.collection.queryParamsModel.on('change:_max_page', function (model, value) {
+                self.$pageMax.text(value);
             });
             this.collection.queryParamsModel.on('change:page', function (model, value) {
                 self.$pageNumber.text(value);
@@ -77,12 +81,10 @@ define([
                 this.handleSearchInputChange();
             },
             'click .link-prev': function () {
-                var qpm = this.collection.queryParamsModel;
-                qpm.set('page', qpm.get('page') - 1);
+                this.collection.queryParamsModel.goPrevPage();
             },
             'click .link-next': function () {
-                var qpm = this.collection.queryParamsModel;
-                qpm.set('page', qpm.get('page') + 1);
+                this.collection.queryParamsModel.goNextPage();
             },
         },
         handleSearchInputChange: function () {
