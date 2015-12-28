@@ -1,6 +1,8 @@
 # coding=utf-8
 from django.db import models
 from django_pgjson.fields import JsonBField
+from djorm_pgfulltext.models import SearchManager
+from djorm_pgfulltext.fields import VectorField
 
 
 class NewsItem(models.Model):
@@ -12,6 +14,16 @@ class NewsItem(models.Model):
     text = models.TextField()
     publish_date = models.DateTimeField()
     retrieval_date = models.DateTimeField()
+
+    search_index = VectorField()
+
+    objects = SearchManager(
+        fields=('text',),
+        # config = 'pg_catalog.english',  # this is default
+        config = 'pg_catalog.simple',  # this is default
+        search_field = 'search_index',  # this is default
+        auto_update_search_field = True
+    )
 
     def get_title(self):
         parts = self.text.split('\n')

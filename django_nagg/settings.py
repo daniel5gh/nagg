@@ -40,11 +40,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'debug_toolbar',
+    'djorm_pgfulltext',
     'mainpage',
     'viewer',
     'nagg',
     'django_shell_ipynb',
     'djcelery',
+    'crispy_forms',
     'rest_framework',
 )
 
@@ -196,7 +199,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_PAGINATION_CLASS': 'django_nagg.rest.StandardResultsSetPagination',
+    # 'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
 }
 
 PGJSON_ENCODER_CLASS = 'nagg.NumpyEncoder'
 PGJSON_LOADS_FUNC = 'nagg.json_numpy_loads'
+
+# SHOW_TOOLBAR_CALLBACK = lambda x: True
+INTERNAL_IPS = '192.168.2.3'

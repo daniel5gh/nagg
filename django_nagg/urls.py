@@ -17,7 +17,8 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.db.models import Count
-from rest_framework import routers, serializers, viewsets
+from rest_framework import routers, serializers, viewsets, filters
+from rest_framework.filters import BaseFilterBackend
 
 from nagg.models import NewsItem
 
@@ -29,10 +30,21 @@ class NewsItemSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'url', 'source', 'text', 'publish_date', 'retrieval_date')
 
 
+class SearchFilter(BaseFilterBackend):
+    """pg full text search"""
+    def filter_queryset(self, request, queryset, view):
+        search_string = request.query_params.get('q', '')
+        qs = queryset.search(search_string)
+        return qs
+
+
 # ViewSets define the view behavior.
 class NewsItemViewSet(viewsets.ModelViewSet):
     queryset = NewsItem.objects.all().order_by('-publish_date')
     serializer_class = NewsItemSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       SearchFilter)
+    filter_fields = ('source', 'url', 'publish_date', 'id')
 
 
 # noinspection PyAbstractClass
