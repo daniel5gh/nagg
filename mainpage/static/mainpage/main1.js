@@ -10,6 +10,7 @@ define([
     var MainPageRouter = Backbone.Router.extend({
         routes: {
             "page/:page": "page",  // #page/12
+            "page/:page/:page_size": "page",  // #page/12/10
             "*actions": "defaultRoute",  // matches http://example.com/#anything-here
         },
     });
@@ -34,8 +35,11 @@ define([
         newsItemCollection.fetch();
     });
 
-    mpr.on('route:page', function (pageNr) {
-        newsItemCollection.queryParams.page = pageNr;
+    mpr.on('route:page', function (pageNr, pageSize) {
+        if (pageSize) {
+            newsItemCollection.queryParams.page_size = +pageSize;
+        }
+        newsItemCollection.queryParams.page = +pageNr;
         newsItemCollection.fetch();
     });
 
