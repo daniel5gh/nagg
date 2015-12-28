@@ -14,5 +14,15 @@ define([
             this.urlPrevious = response.previous;
             return response.results;
         },
+        queryParams: {
+            page: 1,
+        },
+        fetch: function(options) {
+            options || (options = {});
+            options.data || (options.data = {});
+            $.extend(options.data, this.queryParams);
+            console.log('fetch', options);
+            return this.constructor.__super__.fetch.apply(this, [options]);
+        },
     });
 });
