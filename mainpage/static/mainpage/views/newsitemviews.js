@@ -60,14 +60,21 @@ define([
             return this;
         },
         events: {
-            'keyup .search-box': function() {
-                var self = this;
-                clearTimeout(self.searchTimer);
-                this.searchTimer = setTimeout(function () {
-                    self.collection.queryParams.q = self.$searchBox.val();
-                    self.collection.fetch();
-                }, 100);
-            }
+            'input .search-box': function () {
+                this.handleSearchInputChange();
+            },
+            'click .search-box-clear-button': function () {
+                this.$searchBox.val('');
+                this.handleSearchInputChange();
+            },
+        },
+        handleSearchInputChange: function () {
+            var self = this;
+            clearTimeout(self.searchTimer);
+            this.searchTimer = setTimeout(function () {
+                self.collection.queryParams.q = self.$searchBox.val();
+                self.collection.fetch();
+            }, 100);
         },
         addRowView: function (model) {
             var newsItemView = new NewsItemRow({model: model});
@@ -80,7 +87,7 @@ define([
         },
         render: function () {
             var self = this;
-            this.$list.fadeOut(300, function() {
+            this.$list.fadeOut(300, function () {
                 self.$list.html('');
             });
 
