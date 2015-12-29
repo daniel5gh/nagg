@@ -55,3 +55,17 @@ class NewsItemCollectionMembership(models.Model):
     newsitemcollection = models.ForeignKey(NewsItemCollection)
     data = JsonBField(default=dict)
 
+# insert into nagg_newsitemcollectionmembership (newsitem_id, newsitemcollection_id, data)
+# select id as newsitem_id, 2 as newsitemcollection_id, '{}'::jsonb as data from nagg_newsitem limit 10;
+#
+# from django.db import connection
+# sql ="""select word, ndoc from ts_stat(
+# 'SELECT "nagg_newsitem"."search_index" """
+# """FROM "nagg_newsitem" """
+# """INNER JOIN "nagg_newsitemcollectionmembership" """
+# """ON ("nagg_newsitem"."id" = "nagg_newsitemcollectionmembership"."newsitem_id") """
+# """WHERE "nagg_newsitemcollectionmembership"."newsitemcollection_id" = %d'
+# ) order by ndoc desc limit(1000);"""
+# cursor = connection.cursor()
+# cursor.execute(sql % 2)
+# ndocs = dict(cursor.fetchall())
