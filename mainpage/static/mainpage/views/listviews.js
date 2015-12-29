@@ -92,6 +92,16 @@ define([
             this.collection.queryParamsModel.on('change:page', function (model, value) {
                 self.$pageNumber.text(value);
             });
+            $(document).keydown(function(e){
+                var key = e.keyCode;
+                if ( key == 37  ){
+                    // left arrow
+                    self.collection.queryParamsModel.goPrevPage();
+                } else if (key == 39){
+                    // right arrow
+                    self.collection.queryParamsModel.goNextPage();
+                }
+            });
             return this;
         },
         events: {
