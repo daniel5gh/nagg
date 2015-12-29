@@ -17,6 +17,7 @@ define([
                 this.set('_max_page', max);
             }
             if (key === 'page') {
+                window.app.navigate('page/' + value + '/' + this.get('page_size'));
                 value = Math.max(1, value);
             }
             Backbone.Model.prototype.set.apply(this, [key, value, options]);
@@ -50,6 +51,12 @@ define([
             this.set('page', this.getPrevPageNr());
             return this;
         },
+        goPage: function(page, pageSize) {
+            if (pageSize) {
+                this.set('page_size', pageSize, {silent: true});
+            }
+            this.set('page', page);
+        }
     });
 
     return Backbone.Collection.extend({
@@ -68,7 +75,7 @@ define([
                 self.queryParamsModel.set('_total', 0);
             });
 
-            this.fetch();
+            //this.fetch();
             return this;
         },
         // Django Rest Framework API returns items under "results".

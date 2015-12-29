@@ -9,11 +9,11 @@ define([
 ], function ($, d3, BackBone, NewsItemViews, NewsItems, FacetViews, Facets) {
     var MainPageRouter = Backbone.Router.extend({
         routes: {
-            "page/:page": "page",  // #page/12
-            "page/:page/:page_size": "page",  // #page/12/10
+            "page/:page(/:page_size)": "page",  // #page/12/10
             "*actions": "defaultRoute",  // matches http://example.com/#anything-here
         },
     });
+    window.app = new MainPageRouter();
 
     var sourceFacetCollection = new Facets.SourceFacetCollection();
     var sourceFacetView = new FacetViews.SourceFacetView({
@@ -27,10 +27,14 @@ define([
         collection: newsItemCollection,
     });
 
-    var mpr = new MainPageRouter();
 
-    mpr.on('route:defaultRoute', function (actions) {
+    window.app.on('route:defaultRoute', function (actions) {
         console.log('default route actions: ' + actions);
+        newsItemCollection.fetch();
+    });
+    window.app.on('route:page', function (page, pageSize) {
+        console.log('page: ', arguments);
+        newsItemCollection.queryParamsModel.goPage(page, pageSize);
     });
 
     sourceFacetCollection.fetch();
