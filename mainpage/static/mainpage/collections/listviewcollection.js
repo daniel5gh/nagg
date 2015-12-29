@@ -14,13 +14,18 @@ define([
             _total: 0,
             _max_page: 1,
         },
-        set: function (key, value, options) {
-            if (key === '_total') {
+        initialize: function () {
+            this.on('change:_total', function (model, value) {
                 var max = Math.ceil(value / this.get('page_size'));
                 this.set('_max_page', max);
-            }
-            if (key === 'page') {
+            });
+            this.on('change:page', function (model, value) {
                 window.app.navigate('page/' + value + '/' + this.get('page_size'));
+            });
+        },
+        set: function (key, value, options) {
+            if (key === 'page') {
+                // clamp, page 0 freaks out the rest endpoint (404)
                 value = Math.max(1, value);
             }
             Backbone.Model.prototype.set.apply(this, [key, value, options]);
