@@ -15,33 +15,7 @@
     </div>
     <div class="col-md-10">
         <div class="starter-template">
-            <div id="main-table" class="panel panel-default">
-                <div class="panel-heading clearfix">
-                    <h4 class="panel-title pull-left"><strong>News Items</strong></h4>
-
-                    <div class="btn-group btn-group-xs pull-right" role="group">
-                        <a class="link-prev btn btn-default" role="button"><span
-                                class="glyphicon glyphicon-chevron-left"></span></a>
-                        <a class="link-next btn btn-default" role="button"><span
-                                class="glyphicon glyphicon-chevron-right"></span></a>
-                    </div>
-                </div>
-                <div class="panel-heading clearfix">
-                    <span class="nr-hits">0</span> Hits Page: <span class="page-number">1</span>/<span
-                        class="page-max">1</span>
-                </div>
-                <div class="panel-heading clearfix input-group">
-                    <input type="search" class="search-box form-control" placeholder="Search">
-
-                    <div class="input-group-btn">
-                        <button class="search-box-clear-button btn btn-primary"><i
-                                class="glyphicon glyphicon-remove-circle"></i></button>
-                        <button class="btn btn-primary"><i class="glyphicon glyphicon-wrench"></i></button>
-                    </div>
-                </div>
-                <div class="list-group">
-                </div>
-            </div>
+            {% include 'mainpage/main-table.html' with title='News Items' %}
         </div>
     </div>
 {% endblock %}

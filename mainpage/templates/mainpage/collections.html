@@ -1,14 +1,26 @@
 {% extends 'mainpage/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="col-md-2">
-    </div>
-    <div class="col-md-10">
+    <div class="col-md-12">
         <div class="starter-template">
+            {% include 'mainpage/main-table.html' with title='Collections' %}
         </div>
     </div>
 {% endblock %}
 {% block scripts %}
-{#<script async data-main="{% static 'mainpage/mainpage.js' %}"#}
-{#        src="{% static 'node_modules/requirejs/require.js' %}"></script>#}
+    <script id="collection-row-template" type="text/html">
+        <% var arrowClass = obj._expanded ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'; %>
+        <h4 class="list-group-item-heading">
+            <%- name || "No Name" %> (<%- doc_count %>)
+            <span class="pull-right small ">
+                <span class="expand-button glyphicon <%- arrowClass %>" role="button"></span>
+            </span>
+        </h4>
+        <div class="collapse list-group-item-text">
+            <p><%- metadata %></p>
+        </div>
+    </script>
+
+    <script async data-main="{% static 'mainpage/collectionspage.js' %}"
+        src="{% static 'node_modules/requirejs/require.js' %}"></script>
 {% endblock %}
