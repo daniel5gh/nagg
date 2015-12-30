@@ -20,7 +20,7 @@ from django.db.models import Count
 from rest_framework import routers, serializers, viewsets, filters
 from rest_framework.filters import BaseFilterBackend
 
-from nagg.models import NewsItem
+from nagg.models import NewsItem, NewsItemCollection
 
 
 # Serializers define the API representation.
@@ -61,6 +61,29 @@ class NewsItemSourceFacet(viewsets.ModelViewSet):
     serializer_class = NewsItemSourceFacetSerializer
     pagination_class = None
 
+
+# Serializers define the API representation.
+class CollectionSerializer(serializers.HyperlinkedModelSerializer):
+    doc_count = serializers.IntegerField()
+
+    class Meta:
+        model = NewsItemCollection
+        fields = ('name', 'metadata', 'doc_count')
+
+
+# ViewSets define the view behavior.
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = \
+        (NewsItemCollection.objects
+         .all()
+         .order_by('id')
+         .annotate(doc_count=Count('items'))
+         )
+    serializer_class = CollectionSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('name', 'metadata', 'id',)
+
+
 # date facets
 # select date(publish_date), count(publish_date)
 # from nagg_newsitem
@@ -72,6 +95,7 @@ class NewsItemSourceFacet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 router.register(r'newsitems', NewsItemViewSet)
 router.register(r'facet/newsitems/source', NewsItemSourceFacet)
+router.register(r'collections', CollectionViewSet)
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
