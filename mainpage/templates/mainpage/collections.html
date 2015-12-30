@@ -23,4 +23,7 @@
 
     <script async data-main="{% static 'mainpage/collectionspage.js' %}"
         src="{% static 'node_modules/requirejs/require.js' %}"></script>
+    <script type="application/javascript">
+        document.getElementById('collections-nav').setAttribute('class', 'active');
+    </script>
 {% endblock %}

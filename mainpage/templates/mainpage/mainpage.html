@@ -43,5 +43,9 @@
     </div>
 </script>
 <script async data-main="{% static 'mainpage/mainpage.js' %}"
-        src="{% static 'node_modules/requirejs/require.js' %}"></script>
+        src="{% static 'node_modules/requirejs/require.js' %}">
+</script>
+    <script type="application/javascript">
+        document.getElementById('home-nav').setAttribute('class', 'active');
+    </script>
 {% endblock %}
