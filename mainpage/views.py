@@ -8,3 +8,7 @@ class MainPageView(TemplateView):
 
 class CollectionsView(TemplateView):
     template_name = "mainpage/collections.html"
+
+
+class StatusView(TemplateView):
+    template_name = "mainpage/status.html"
