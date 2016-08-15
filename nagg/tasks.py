@@ -60,7 +60,7 @@ def do_one_leecher(self, leecher):
             )
             ni.save()
             i += 1
-        _log.info('Adding %d', i)
+        _log.info('Adding %d from %s', i, source_id)
     except Exception:
         _log.exception('Error doing %s', source_id)
         raise

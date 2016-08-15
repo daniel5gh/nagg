@@ -188,7 +188,8 @@ class ArticleParserMixin:
     def parse_article(self, url):
         data = _get_url_content(url, cookies=self.cookies)
         soup = bs4.BeautifulSoup(data, "html.parser")
-        node = soup.find_all(attrs=self.article_node_selector)[0]
+        nodes = soup.find_all(attrs=self.article_node_selector)
+        node = nodes[0]
         return self.extract_from_node(node)
 
 
@@ -228,8 +229,8 @@ class GenericRSSLeecher(FeedLeecher):
                     'date': date,
                     'content': content,
                 }
-            else:
-                _log.debug('out of date. ' + title)
+#            else:
+#                _log.debug('out of date. ' + title)
 
 
 # noinspection PyMethodMayBeStatic

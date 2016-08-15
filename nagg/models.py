@@ -10,7 +10,7 @@ class NewsItem(models.Model):
 
     #: From where the article has been fetched.
     source = models.TextField()
-    url = models.URLField()
+    url = models.URLField(max_length=1024)
     text = models.TextField()
     publish_date = models.DateTimeField()
     retrieval_date = models.DateTimeField()
