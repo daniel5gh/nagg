@@ -20,10 +20,9 @@ define([
             if (!this.template) {
                 console.error('ListItem (', self, ') Please add template to this view.');
             }
-
             this.model.on('change', this.render, this);
             this.model.on('remove', function () {
-                //self.$el.fadeOut(160, function() { $(this).remove(); });
+                // self.$el.fadeOut(160, function() { $(this).remove(); });
                 self.$el.remove();
             });
             // not rendered yet
@@ -82,6 +81,10 @@ define([
             // when sync is done, we know we have new values for next/prev
             this.collection.on('reset', this.render, this);
             this.collection.on('add', this.addListItem, this);
+	    this.collection.on('request', this.requestStarted, this);
+	    this.collection.on('sync', function () { 
+	        self.$list.css('opacity', '1');
+            });
 
             this.collection.queryParamsModel.on('change:_total', function (model, value) {
                 self.$nrHits.text(value);
@@ -119,6 +122,12 @@ define([
                 this.collection.queryParamsModel.goNextPage();
             },
         },
+        requestStarted: function () {
+	    console.log(arguments);
+	    //this.$list.css('backgroundColor','hsl(0,100%,50%');;
+	    this.$list.css('opacity', '0.17')
+
+        },
         handleSearchInputChange: function () {
             var self = this;
             clearTimeout(self.searchTimer);
@@ -137,9 +146,9 @@ define([
         },
         render: function () {
             var self = this;
-            this.$list.fadeOut(300, function () {
                 self.$list.html('');
-            });
+		
+	    this.$list.css('opacity', 1.0);
 
             this.collection.each(function (item) {
                 self.addListItem(item);
