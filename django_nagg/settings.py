@@ -43,8 +43,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'djorm_pgfulltext',
     'mainpage',
-    'viewer',
     'nagg',
+
     'django_shell_ipynb',
     'djcelery',
     'crispy_forms',
