@@ -68,3 +68,8 @@ Javascript
 
 Currently using require JS, considering using webpack because ES 6 transpiling
 and sane importing / exporting!
+
+Screenshot
+==========
+
+.. image:: doc/scrn0001.png
