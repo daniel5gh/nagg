@@ -24,3 +24,27 @@ yet. You can initiate a leech run::
 Now observe lots of output on the terminal that is running the
 `docker-compose up`.
 
+Contents
+========
+
+==================== =========================================================
+Path                 Description
+==================== =========================================================
+brains               ML stuff / common pyspark functions
+django_nagg          Django main project dir
+doc                  Sphinx (API) docs
+docker               Dockerfile and scripts
+mainpage             Django app Web-UI
+nagg                 Django app data acquire / storage
+shell_ipynb          IPython notebooks with random experiments
+static_root          Static files, served by django's runserver. contains 3rd party JS
+==================== =========================================================
+
+Notes
+=====
+
+There are hardcoded paths!
+
+1. docker-compose volumes
+#. findspark in `brains/spark_common.py`
+#. IPython notebooks
