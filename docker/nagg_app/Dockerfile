@@ -7,7 +7,6 @@
 # The purpose of this image is to provide a development environment and
 # has all development dependencies to build a wheel package of NAGG, which
 # could then be installed in a production suitable setup.
-# TODO: npm install
 FROM phusion/baseimage:0.9.19
 
 RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
@@ -32,8 +31,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y netcat
 # TODO: pin in requirements, celery is not compatible with 1.10
 RUN /nagg_ve/bin/pip install django==1.9
 
+# install nodejs for npm and later on webpack!
+ADD docker/nagg_app/nodesource.gpg.key /
+RUN     set -x \
+    && echo 'deb https://deb.nodesource.com/node_6.x xenial main' > /etc/apt/sources.list.d/nodesource.list \
+    && apt-key add /nodesource.gpg.key \
+    && rm -rf /nodesource.gpg.key \
+    && apt-get -y update \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y install nodejs
+
 # use 1000, convinient because I am 1000 too, yay!
-RUN groupadd -r nagg -g 1000 && useradd -r -u 1000 -g nagg nagg
+RUN groupadd -r nagg -g 1000 && useradd -r -u 1000 -g nagg nagg && mkdir -p /home/nagg && chown 1000:1000 /home/nagg
 
 ENV PYTHONUNBUFFERED 1
 ENV DB_SERVICE_PORT=5432
@@ -71,8 +79,18 @@ CMD ["/sbin/my_init"]
 # botoom of the dockerfile to prevent caches from being invalidated
 ADD . /nagg_src
 RUN  set -x \
+    && chown -R nagg:nagg /nagg_src/ \
     && cd /nagg_src/ \
     && /nagg_ve/bin/python setup.py develop
+
+# not needed right now, we're mounting hosts code anyway
+#USER nagg
+#RUN ls -la /
+#RUN ls -la /nagg_src/
+#RUN ls -la /nagg_src/static_root
+#RUN ls -la /nagg_src/static_root/node_modules
+#RUN cd /nagg_src/static_root && npm install
+#USER root
 
 # clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
