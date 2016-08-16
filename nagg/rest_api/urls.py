@@ -16,11 +16,18 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from rest_framework import routers
+
+from nagg.rest_api.views import (
+    NewsItemViewSet, NewsItemSourceFacet,
+    CollectionViewSet)
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'newsitems', NewsItemViewSet)
+router.register(r'facet/newsitems/source', NewsItemSourceFacet)
+router.register(r'collections', CollectionViewSet)
 
 urlpatterns = [
-    url(r'^grappelli/', include('grappelli.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/', include('nagg.rest_api.urls')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^', include('mainpage.urls')),
+    url(r'^v1/', include(router.urls)),
 ]
