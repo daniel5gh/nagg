@@ -48,3 +48,6 @@ There are hardcoded paths!
 1. docker-compose volumes
 #. findspark in `brains/spark_common.py`
 #. IPython notebooks
+
+Hardcoded UID / GID (1000) for the nagg user in Dockerfile for great convenience
+when mounting code from host!
