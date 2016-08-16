@@ -15,8 +15,9 @@ setup(
             'nagg_manage = django_nagg:manage',
         ]
     },
-    requires=['feedparser', 'requests', 'django-grappelli',
-              'psycopg2', 'beautifulsoup4', 'django',
-              'django-celery', 'celery[redis]', 'youtube_dl', 'numpy'
-              ]
+    # FIXME: ValueError: expected parenthesized list: '-grappelli'
+    # requires=['feedparser', 'requests', 'django-grappelli',
+    #           'psycopg2', 'beautifulsoup4', 'django',
+    #           'django-celery', 'celery[redis]', 'youtube_dl', 'numpy'
+    #           ]
 )

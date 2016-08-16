@@ -90,11 +90,12 @@ WSGI_APPLICATION = 'django_nagg.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'naggdb',
-        'USER': 'nagg',
-        'PASSWORD': 'nagg',
-        'HOST': 'db1.lxc',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'naggdb'),
+        # default user and password in postgres docker image
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': os.getenv('DB_SERVICE_HOST', 'db'),
+        'PORT': os.getenv('DB_SERVICE_PORT', '5432'),
     }
 }
 
@@ -126,7 +127,10 @@ GRAPPELLI_ADMIN_TITLE = 'NAGG'
 
 # Celery settings
 
-BROKER_URL = 'redis://localhost:6379/10'
+BROKER_URL = 'redis://{}:{}/10'.format(
+    os.getenv('REDIS_SERVICE_HOST', 'redis'),
+    os.getenv('REDIS_SERVICE_PORT', '6379')
+)
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -202,6 +206,7 @@ REST_FRAMEWORK = {
     # 'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
 }
 
+# a nifty way of encoding numpy arrays as json!
 PGJSON_ENCODER_CLASS = 'nagg.NumpyEncoder'
 PGJSON_LOADS_FUNC = 'nagg.json_numpy_loads'
 

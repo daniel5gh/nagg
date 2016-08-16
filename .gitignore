@@ -71,3 +71,4 @@ doc/_static
 # vim
 *.swp
 static_root/node_modules
+local_data

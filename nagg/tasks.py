@@ -14,7 +14,7 @@ from .models import NewsItem
 __author__ = 'daniel'
 _log = get_task_logger(__name__)
 
-DOWNLOAD_PATH = '/dream/nagg_download'
+DOWNLOAD_PATH = '/nagg_download'
 
 
 @celery_app.task(bind=True)

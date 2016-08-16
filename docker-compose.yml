@@ -1,0 +1,29 @@
+# need version 2 for build object
+version: "2"
+services:
+  db:
+    image: postgres:9.5
+    volumes:
+      - ./local_data/psql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=nagg_db
+  redis:
+    image: redis:3
+    volumes:
+      - ./local_data/redis:/data
+  nagg_app:
+    build:
+      context: .
+      dockerfile: docker/nagg_app/Dockerfile
+    image: nagg_app
+    volumes:
+      - .:/nagg_src
+      # leech artifacts are places here, such as youtube videos and subtitles
+      - /rpool/dream/nagg_download/:/nagg_download
+    ports:
+      - "8000:8000"
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
